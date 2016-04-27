@@ -1,0 +1,115 @@
+package mod.mindcraft.seasons;
+
+import java.util.HashMap;
+
+import mod.mindcraft.seasons.api.IWorldInterface;
+import mod.mindcraft.seasons.api.NoWorldException;
+import mod.mindcraft.seasons.api.SeasonsAPI;
+import mod.mindcraft.seasons.api.enums.EnumSeason;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
+
+public class WorldInterface implements IWorldInterface {
+	
+	private World worldObj;
+
+	public void setWorld(World world) {
+		this.worldObj = world;
+	}
+
+	public void removeWorld() {
+		setWorld(null);
+		WorldHandler.tempMap.clear();
+	}
+	
+	public void setTemp(BlockPos pos, float temp) {
+		WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(pos).getChunkCoordIntPair()).addBlockTemp(pos, temp);
+	}
+	
+	@Override
+	public EnumSeason getSeason() throws NoWorldException {
+		if (getWorld() == null)
+			throw new NoWorldException("Cannot find world !");
+		return getSeason(getWorld().getTotalWorldTime());
+	}
+	
+	@Override
+	public EnumSeason getSeason(long time) {
+		long seasonLenght = 24000 * SeasonsAPI.instance.getCfg().seasonLenght;
+		long yearTime = time % (seasonLenght * 4);
+		int seasonOrdinal = (int) Math.floor(yearTime / seasonLenght);
+		if (seasonOrdinal > 3)
+			throw new ArrayIndexOutOfBoundsException(seasonOrdinal);
+		return EnumSeason.values()[seasonOrdinal];
+	}
+	
+	@Override
+	public float getTemperature(BlockPos pos) {
+		if (pos == null)
+			return 0F;
+		BlockPos newPos = pos.down().up();
+		if (getWorld() == null)
+			return 0F;
+		if (WorldHandler.tempMap == null)
+			WorldHandler.tempMap = new HashMap<ChunkCoordIntPair, ChunkTemperature>();
+		try {
+			if (!getWorld().getChunkProvider().chunkExists((int)Math.floor((float)pos.getX() / 16F), (int)Math.floor((float)pos.getZ() / 16F)))
+				return 0;
+			float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).getTempForBlock(newPos);
+			temp += (getWorld().getBiomeGenForCoords(pos).temperature * 12.5F * ((float)((getWorld().getTotalWorldTime() + 12000) % 24000 - 12000) / 12000F));
+			return temp > 0 ? temp * getSeason().temperatureMultiplier : temp * getSeason().getOpposite().temperatureMultiplier;
+		} catch (NullPointerException e) {
+			ChunkTemperature temp = new ChunkTemperature();
+			temp.calcChunkTemp(getWorld(), getWorld().getChunkFromBlockCoords(newPos).xPosition * 16, getWorld().getChunkFromBlockCoords(newPos).zPosition * 16);
+			WorldHandler.tempMap.put(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair(), temp);
+			float temp2 = temp.getTempForBlock(newPos);
+			temp2 += (getWorld().getBiomeGenForCoords(pos).temperature * 12.5F * ((float)((getWorld().getTotalWorldTime() + 12000) % 24000 - 12000) / 12000F));
+			try {
+				return temp2 > 0 ? temp2 * getSeason().temperatureMultiplier : temp2 * getSeason().getOpposite().temperatureMultiplier;
+			} catch (NoWorldException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		} catch (NoWorldException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	@Override
+	public float getTemperatureForBiome(BiomeGenBase biome) {
+		return 12.5F * biome.temperature;
+	}
+
+	@Override
+	public float getTemperatureFromTime(BiomeGenBase biome, long time) throws NoWorldException {
+		float temp = getTemperatureForBiome(biome) + (biome.temperature * 25F * ((float)((time + 12000) % 24000 - 12000) / 12000F));
+		return temp > 0 ? temp * getSeason().temperatureMultiplier : temp * getSeason().getOpposite().temperatureMultiplier;
+	}
+
+	@Override
+	public float getTemperatureFromTime(BlockPos pos, long time) throws NoWorldException {
+		if (getWorld() == null)
+			throw new NoWorldException("Cannot find world !");
+		return getTemperatureFromTime(getWorld().getBiomeGenForCoords(pos), time);
+	}
+
+	@Override
+	public float getTemperatureFromTime(BiomeGenBase biome) throws NoWorldException {
+		if (getWorld() == null)
+			throw new NoWorldException("Cannot find world !");
+		return getTemperatureFromTime(biome, getWorld().getTotalWorldTime());
+	}
+
+	@Override
+	public float getTemperatureFromTime(BlockPos pos) throws NoWorldException {
+		return getTemperatureFromTime(pos, getWorld().getTotalWorldTime());
+	}
+
+	public World getWorld() {
+		return worldObj;
+	}
+
+}

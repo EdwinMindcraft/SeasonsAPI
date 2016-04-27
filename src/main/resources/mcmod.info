@@ -1,0 +1,16 @@
+[
+{
+  "modid": "seasonsapi",
+  "name": "Seasons API",
+  "description": "Add a season system to minecraft",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["EdwinMindcraft"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
