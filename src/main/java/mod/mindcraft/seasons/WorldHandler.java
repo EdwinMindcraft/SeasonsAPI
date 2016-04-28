@@ -1,7 +1,10 @@
 package mod.mindcraft.seasons;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
+import mod.mindcraft.seasons.api.DamageSources;
 import mod.mindcraft.seasons.api.SeasonsAPI;
 import mod.mindcraft.seasons.api.SeasonsCFG;
 import net.minecraft.command.CommandBase;
@@ -12,10 +15,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.config.Property;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class WorldHandler {
@@ -51,19 +56,58 @@ public class WorldHandler {
 	}
 	
 	@SubscribeEvent
+	public void onConfigChanged (ConfigChangedEvent e) {
+		if (!e.modID.equals("seasonsapi"))
+			return;
+		SeasonsCFG cfg = SeasonsAPI.instance.cfg;
+		ArrayList<String> propOrder = new ArrayList<String>();
+		Property prop = cfg.get("seasons", "Season Lenght", 7);
+		propOrder.add(prop.getName());
+		cfg.setCategoryPropertyOrder("seasons", propOrder);
+		cfg.save();
+		cfg.reload();
+	}
+	
+	@SubscribeEvent
 	public void livingTick (LivingUpdateEvent e) {
 		SeasonsCFG cfg = SeasonsAPI.instance.getCfg();
 		if (e.entityLiving.isPotionActive(Seasons.HYPOTHERMIA)) {
 			PotionEffect hypothermia = e.entityLiving.getActivePotionEffect(Seasons.HYPOTHERMIA);
 			e.entityLiving.motionX -= e.entityLiving.motionX * (((double)hypothermia.getAmplifier() + 1D) * 0.10);
 			e.entityLiving.motionZ -= e.entityLiving.motionZ * (((double)hypothermia.getAmplifier() + 1D) * 0.10);
+			if (hypothermia.getAmplifier() > 0 && e.entityLiving.ticksExisted % 20 == 0)
+				e.entityLiving.attackEntityFrom(DamageSources.hypothermia, hypothermia.getAmplifier());
 		}
+		if (e.entityLiving.isPotionActive(Seasons.BURNT)) {
+			PotionEffect burnt = e.entityLiving.getActivePotionEffect(Seasons.BURNT);
+			Random rand = new Random();
+			if (rand.nextFloat() < (0.01F * (burnt.getAmplifier() + 1)))
+				e.entityLiving.setFire(2 + burnt.getAmplifier());
+			if (burnt.getAmplifier() > 0 && e.entityLiving.ticksExisted % 20 == 0)
+				e.entityLiving.attackEntityFrom(DamageSources.burnt, burnt.getAmplifier());
+		}
+
 		if (cfg.enableHardcoreTemperature) {
 			ChunkTemperature temp = tempMap.get(e.entityLiving.worldObj.getChunkFromBlockCoords(e.entityLiving.getPosition()).getChunkCoordIntPair());
+			try {
+				tempMap.get(e.entityLiving.worldObj.getChunkFromBlockCoords(e.entityLiving.getPosition()).getChunkCoordIntPair()).calcBlockTemp(e.entityLiving.worldObj, e.entityLiving.getPosition());
+			} catch (Exception ex) {}
 			if (temp != null) {
 				if (temp.getTempForBlock(e.entityLiving.getPosition()) < cfg.hypothermiaStart) {
-					int hypothermiaLevel = (int) Math.floor(Math.abs(temp.getTempForBlock(e.entityLiving.getPosition())) / (float)cfg.hypothermiaLevelDiff);
-					e.entityLiving.addPotionEffect(new PotionEffect(Seasons.HYPOTHERMIA.id, 201, hypothermiaLevel));
+					int hypothermiaLevel = (int) Math.floor(Math.abs(temp.getTempForBlock(e.entityLiving.getPosition()) - cfg.hypothermiaStart) / (float)cfg.hypothermiaLevelDiff);
+					e.entityLiving.removePotionEffect(Seasons.HYPOTHERMIA.id);
+					e.entityLiving.addPotionEffect(new PotionEffect(Seasons.HYPOTHERMIA.id, 201, hypothermiaLevel, true, false));
+				} else if (temp.getTempForBlock(e.entityLiving.getPosition()) > cfg.burntStart) {
+					int burntLevel = (int) Math.floor(Math.abs(temp.getTempForBlock(e.entityLiving.getPosition()) - cfg.burntStart) / (float)cfg.burntDiff);
+					e.entityLiving.removePotionEffect(Seasons.BURNT.id);
+					e.entityLiving.addPotionEffect(new PotionEffect(Seasons.BURNT.id, 200, burntLevel));
+				} else {
+					PotionEffect hypothermia = e.entityLiving.getActivePotionEffect(Seasons.HYPOTHERMIA);
+					PotionEffect burnt = e.entityLiving.getActivePotionEffect(Seasons.BURNT);
+					if (hypothermia != null && hypothermia.getIsAmbient())
+						e.entityLiving.removePotionEffect(Seasons.HYPOTHERMIA.id);
+					if (burnt != null && e.entityLiving.isInWater())
+						e.entityLiving.removePotionEffect(Seasons.BURNT.id);
 				}
 			}
 		}

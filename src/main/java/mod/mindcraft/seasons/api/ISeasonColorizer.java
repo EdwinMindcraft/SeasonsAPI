@@ -43,7 +43,7 @@ public interface ISeasonColorizer {
 //				System.out.println("Main Color : " + new Color(cColor).toString());
 //				System.out.println("Secondary Color : " + new Color(oColor).toString());
 				return ColorizerUtils.mix(cColor, oColor, current);
-			} catch (NoWorldException e) {return 0xffffff;}
+			} catch (NullPointerException e) {return 0xffffff;}
 		}
 		
 		private int getColor(EnumSeason season, IBlockState state) {

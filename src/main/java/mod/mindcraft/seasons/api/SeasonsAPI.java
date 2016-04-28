@@ -4,7 +4,7 @@ public class SeasonsAPI {
 	
 	private IWorldInterface worldInterface;
 	private IBlockTemperatureRegistry blockTemperatureRegistry;
-	private SeasonsCFG cfg;
+	public SeasonsCFG cfg;
 	
 	public static final SeasonsAPI instance = new SeasonsAPI();
 	

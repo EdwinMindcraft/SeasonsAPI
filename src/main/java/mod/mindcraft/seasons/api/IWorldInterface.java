@@ -8,9 +8,9 @@ public interface IWorldInterface {
 	
 	/**
 	 * @return Season depending on the world time
-	 * @throws NoWorldException
+	 * 
 	 */
-	public EnumSeason getSeason() throws NoWorldException;
+	public EnumSeason getSeason();
 	
 	/**
 	 * @param time
@@ -40,9 +40,9 @@ public interface IWorldInterface {
 	 * @param biome input biome
 	 * @param time input time
 	 * @return temperature
-	 * @throws NoWorldException 
+	 *  
 	 */
-	public float getTemperatureFromTime(BiomeGenBase biome, long time) throws NoWorldException;
+	public float getTemperatureFromTime(BiomeGenBase biome, long time);
 	
 	/**
 	 * Get the temperature of a biome depending on the time
@@ -50,26 +50,26 @@ public interface IWorldInterface {
 	 * @param pos input pos
 	 * @param time input time
 	 * @return temperature
-	 * @throws NoWorldException 
+	 *  
 	 */
-	public float getTemperatureFromTime(BlockPos pos, long time) throws NoWorldException;
+	public float getTemperatureFromTime(BlockPos pos, long time);
 	
 	/**
 	 * Get the temperature of a biome depending on the world time
 	 * 
 	 * @param biome input biome
 	 * @return temperature
-	 * @throws NoWorldException 
+	 *  
 	 */
-	public float getTemperatureFromTime(BiomeGenBase pos) throws NoWorldException;
+	public float getTemperatureFromTime(BiomeGenBase pos);
 	
 	/**
 	 * Get the temperature of a biome depending on the world time
 	 * 
 	 * @param pos input pos
 	 * @return temperature
-	 * @throws NoWorldException 
+	 *  
 	 */
-	public float getTemperatureFromTime(BlockPos pos) throws NoWorldException;
+	public float getTemperatureFromTime(BlockPos pos);
 
 }

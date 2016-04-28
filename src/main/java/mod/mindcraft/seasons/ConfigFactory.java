@@ -6,6 +6,7 @@ import java.util.Set;
 import mod.mindcraft.seasons.api.SeasonsAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.I18n;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.fml.client.IModGuiFactory;
 import net.minecraftforge.fml.client.config.DummyConfigElement;
@@ -21,15 +22,20 @@ public class ConfigFactory implements IModGuiFactory {
 	public static class ConfigScreen extends GuiConfig {
 
 		public ConfigScreen(GuiScreen parentScreen) {
-			super(parentScreen, getConfigElements(), "seasonsapi", false, false, "seasonsapi.config.name");
+			super(parentScreen, getConfigElements(), "seasonsapi", false, false, I18n.format("seasonsapi.config.name"));
+		}
+		
+		@Override
+		public void onGuiClosed() {
+			super.onGuiClosed();
 		}
 		
 		public static List<IConfigElement> getConfigElements() {
 			List<IConfigElement> list = Lists.newArrayList();
 			
-			list.add(new DummyConfigElement.DummyCategoryElement("temperature", "seasonsapi.config.temperature", ConfigTemperature.class));
-			list.add(new DummyConfigElement.DummyCategoryElement("seasons", "seasonsapi.config.seasons", ConfigSeasons.class));
-			list.add(new DummyConfigElement.DummyCategoryElement("advanced", "seasonsapi.config.advanced", ConfigAdvanced.class));
+			list.add(new DummyConfigElement.DummyCategoryElement("seasonstemperature", I18n.format("seasonsapi.config.temperature"), ConfigTemperature.class));
+			list.add(new DummyConfigElement.DummyCategoryElement("seasonsseasons", I18n.format("seasonsapi.config.seasons"), ConfigSeasons.class));
+			list.add(new DummyConfigElement.DummyCategoryElement("seasonsadvanced", I18n.format("seasonsapi.config.advanced"), ConfigAdvanced.class));
 			
 			return list;
 		}
@@ -44,10 +50,10 @@ public class ConfigFactory implements IModGuiFactory {
             protected GuiScreen buildChildScreen()
             {
                 return new GuiConfig(this.owningScreen,
-                        (new ConfigElement(SeasonsAPI.instance.getCfg().getCategory("temperature"))).getChildElements(),
-                        this.owningScreen.modID, "temperature", this.configElement.requiresWorldRestart() || this.owningScreen.allRequireWorldRestart,
+                        (new ConfigElement(SeasonsAPI.instance.cfg.getCategory("temperature"))).getChildElements(),
+                        this.owningScreen.modID, "seasonstemperature", this.configElement.requiresWorldRestart() || this.owningScreen.allRequireWorldRestart,
                         this.configElement.requiresMcRestart() || this.owningScreen.allRequireMcRestart,
-                        GuiConfig.getAbridgedConfigPath(SeasonsAPI.instance.getCfg().toString()));
+                        GuiConfig.getAbridgedConfigPath(SeasonsAPI.instance.cfg.toString()));
             }
 			
 		}
@@ -62,10 +68,12 @@ public class ConfigFactory implements IModGuiFactory {
             protected GuiScreen buildChildScreen()
             {
                 return new GuiConfig(this.owningScreen,
-                        (new ConfigElement(SeasonsAPI.instance.getCfg().getCategory("seasons"))).getChildElements(),
-                        this.owningScreen.modID, "seasons", this.configElement.requiresWorldRestart() || this.owningScreen.allRequireWorldRestart,
-                        this.configElement.requiresMcRestart() || this.owningScreen.allRequireMcRestart,
-                        GuiConfig.getAbridgedConfigPath(SeasonsAPI.instance.getCfg().toString()));
+                        (new ConfigElement(SeasonsAPI.instance.cfg.getCategory("seasons"))).getChildElements(),
+                        this.owningScreen.modID,
+                        "seasonsseasons",
+                        false,
+                        false,
+                        GuiConfig.getAbridgedConfigPath(SeasonsAPI.instance.cfg.toString()));
             }
 			
 		}
@@ -80,10 +88,10 @@ public class ConfigFactory implements IModGuiFactory {
             protected GuiScreen buildChildScreen()
             {
                 return new GuiConfig(this.owningScreen,
-                        (new ConfigElement(SeasonsAPI.instance.getCfg().getCategory("advanced"))).getChildElements(),
-                        this.owningScreen.modID, "advanced", this.configElement.requiresWorldRestart() || this.owningScreen.allRequireWorldRestart,
+                        (new ConfigElement(SeasonsAPI.instance.cfg.getCategory("advanced"))).getChildElements(),
+                        this.owningScreen.modID, "seasonsadvanced", this.configElement.requiresWorldRestart() || this.owningScreen.allRequireWorldRestart,
                         this.configElement.requiresMcRestart() || this.owningScreen.allRequireMcRestart,
-                        GuiConfig.getAbridgedConfigPath(SeasonsAPI.instance.getCfg().toString()));
+                        GuiConfig.getAbridgedConfigPath(SeasonsAPI.instance.cfg.toString()));
             }
 			
 		}

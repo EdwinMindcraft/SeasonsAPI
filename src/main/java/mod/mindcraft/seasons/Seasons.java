@@ -24,6 +24,7 @@ public class Seasons {
 	public static Seasons instance;
 	
 	public static final Potion HYPOTHERMIA = new SeasonPotion(new ResourceLocation("seasonsapi", "hyporthermia"), true, 0x00ffff).setPotionName("hypothermia");
+	public static final Potion BURNT = new SeasonPotion(new ResourceLocation("seasonsapi", "burnt"), true, 0x990000).setPotionName("burnt");
 	
 	public static SimpleNetworkWrapper network;
 	
@@ -39,9 +40,9 @@ public class Seasons {
 	}
 	
 	private void addTemperatures() {
-		SeasonsAPI.instance.getBlockTemperatureRegistry().addTemperatureToBlock(Blocks.torch.getDefaultState(), 100F, true);
-		SeasonsAPI.instance.getBlockTemperatureRegistry().addTemperatureToBlock(Blocks.lit_pumpkin.getDefaultState(), 100F, true);
-		SeasonsAPI.instance.getBlockTemperatureRegistry().addTemperatureToBlock(Blocks.lit_furnace.getDefaultState(), 100F, true);
+		SeasonsAPI.instance.getBlockTemperatureRegistry().addTemperatureToBlock(Blocks.torch.getDefaultState(), 50F, true);
+		SeasonsAPI.instance.getBlockTemperatureRegistry().addTemperatureToBlock(Blocks.lit_pumpkin.getDefaultState(), 50F, true);
+		SeasonsAPI.instance.getBlockTemperatureRegistry().addTemperatureToBlock(Blocks.lit_furnace.getDefaultState(), 50F, true);
 		SeasonsAPI.instance.getBlockTemperatureRegistry().addTemperatureToBlock(Blocks.lava.getDefaultState(), 2000F, true);
 		SeasonsAPI.instance.getBlockTemperatureRegistry().addTemperatureToBlock(Blocks.flowing_lava.getDefaultState(), 2000F, true);
 		SeasonsAPI.instance.getBlockTemperatureRegistry().addTemperatureToBlock(Blocks.fire.getDefaultState(), 800F, true);				
