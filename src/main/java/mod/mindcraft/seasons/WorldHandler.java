@@ -7,14 +7,17 @@ import java.util.Random;
 import mod.mindcraft.seasons.api.DamageSources;
 import mod.mindcraft.seasons.api.SeasonsAPI;
 import mod.mindcraft.seasons.api.SeasonsCFG;
+import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandTime;
 import net.minecraft.command.NumberInvalidException;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -51,6 +54,13 @@ public class WorldHandler {
 	}
 	
 	@SubscribeEvent
+	public void debugInfo(RenderGameOverlayEvent.Text e) {
+		float temp = (float) (Math.floor(SeasonsAPI.instance.getWorldInterface().getTemperature(Minecraft.getMinecraft().thePlayer.getPosition()) * 100) / 100);
+		if (SeasonsAPI.instance.getCfg().enableTempDebug && Minecraft.getMinecraft().gameSettings.showDebugInfo)
+			e.left.add("§c[SAPI]§r" + (temp < SeasonsAPI.instance.cfg.hypothermiaStart ? "§b" : (temp > SeasonsAPI.instance.cfg.burntStart ? "§4" : "")) + "Temperature : " + temp + " C");
+	}
+	
+	@SubscribeEvent
 	public void worldLoad(WorldEvent.Load e) {
 		((WorldInterface)SeasonsAPI.instance.getWorldInterface()).setWorld(e.world);
 	}
@@ -59,13 +69,19 @@ public class WorldHandler {
 	public void onConfigChanged (ConfigChangedEvent e) {
 		if (!e.modID.equals("seasonsapi"))
 			return;
+		System.out.println("CFG");
 		SeasonsCFG cfg = SeasonsAPI.instance.cfg;
 		ArrayList<String> propOrder = new ArrayList<String>();
 		Property prop = cfg.get("seasons", "Season Lenght", 7);
 		propOrder.add(prop.getName());
 		cfg.setCategoryPropertyOrder("seasons", propOrder);
+		propOrder = new ArrayList<String>();
+		prop = cfg.get("advanced", "Enable Debug", false);
+		propOrder.add(prop.getName());
+		cfg.setCategoryPropertyOrder("advanced", propOrder);
 		cfg.save();
 		cfg.reload();
+		SeasonsAPI.instance.cfg = cfg;
 	}
 	
 	@SubscribeEvent
@@ -90,7 +106,8 @@ public class WorldHandler {
 		if (cfg.enableHardcoreTemperature) {
 			ChunkTemperature temp = tempMap.get(e.entityLiving.worldObj.getChunkFromBlockCoords(e.entityLiving.getPosition()).getChunkCoordIntPair());
 			try {
-				tempMap.get(e.entityLiving.worldObj.getChunkFromBlockCoords(e.entityLiving.getPosition()).getChunkCoordIntPair()).calcBlockTemp(e.entityLiving.worldObj, e.entityLiving.getPosition());
+				if (e.entityLiving instanceof EntityPlayer)
+					tempMap.get(e.entityLiving.worldObj.getChunkFromBlockCoords(e.entityLiving.getPosition()).getChunkCoordIntPair()).calcBlockTemp(e.entityLiving.worldObj, e.entityLiving.getPosition());
 			} catch (Exception ex) {}
 			if (temp != null) {
 				if (temp.getTempForBlock(e.entityLiving.getPosition()) < cfg.hypothermiaStart) {

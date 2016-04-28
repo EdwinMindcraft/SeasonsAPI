@@ -27,6 +27,14 @@ public interface IWorldInterface {
 	public float getTemperature(BlockPos pos);
 	
 	/**
+	 * Get the temperature at a certain position
+	 * @param pos Position
+	 * @param external is block temp used ?
+	 * @return temperature
+	 */
+	public float getTemperature(BlockPos pos, boolean external);
+	
+	/**
 	 * Get the temperature of a biome
 	 * 
 	 * @param biome input biome

@@ -49,7 +49,7 @@ public class ChunkTemperature {
 		this.temp[meta] = temp;
 	}
 	
-	public void calcBlockTemp(World world, BlockPos pos) {
+	public float calcBlockTemp(World world, BlockPos pos) {
 		int meta = (Math.abs(pos.getX()) % 16) + (Math.abs(pos.getZ()) % 16) * 16 + (Math.abs(pos.getY()) % 256) * 256;
 		IChunkProvider provider = world.getChunkProvider();
 		float maxTemp = tempReg.getTemperatureForBlock(world.getBlockState(pos));
@@ -76,13 +76,57 @@ public class ChunkTemperature {
 			}
 		}
 		float timeTemp = wInt.getTemperatureForBiome(world.getBiomeGenForCoords(pos));
-		if (timeTemp > maxTemp) {
+		timeTemp += timeTemp * (-Math.abs(64 - pos.getY()) / 64F);
+		if (maxTemp == Integer.MIN_VALUE) {
 			maxTemp = timeTemp;
-			maxTemp += timeTemp * (-Math.abs(64 - pos.getY()) / 64F);
+		}
+		else if ((maxTemp <= 0 && timeTemp < maxTemp) || (maxTemp > 0 && timeTemp > maxTemp)) {
+			maxTemp = timeTemp;
 		}
 		if (world.getBlockState(pos).getBlock().equals(Blocks.glass))
 			System.out.println(maxTemp);
 		temp[meta] = maxTemp;
+		return maxTemp;
+	}
+	
+	public float calcBlockExternalTemp(World world, BlockPos pos) {
+		int meta = (Math.abs(pos.getX()) % 16) + (Math.abs(pos.getZ()) % 16) * 16 + (Math.abs(pos.getY()) % 256) * 256;
+		IChunkProvider provider = world.getChunkProvider();
+		float maxTemp = Integer.MIN_VALUE;
+		for (int y = -5; y < 6; y++) {
+			if (y + pos.getY() < 0 || y + pos.getY() > 256)
+				continue;
+			for (int x = -5; x < 6; x++) {
+				for (int z = -5; z < 6; z++) {
+					int dist = Math.abs(x) + Math.abs(y) + Math.abs(z);
+					if (dist == 0 || dist > 5)
+						continue;
+					BlockPos newPos = pos.add(x, y, z);
+					if (!provider.chunkExists((int)Math.floor((float)newPos.getX() / 16F), (int)Math.floor((float)newPos.getZ() / 16F)))
+						continue;
+					if (world.isAirBlock(newPos))
+						continue;
+					float temp = tempReg.getTemperatureForBlock(world.getBlockState(newPos));
+					if (temp == Integer.MIN_VALUE)
+						continue;
+					temp *= (5-(float)dist) * 0.2F;
+					if (temp > maxTemp)
+						maxTemp = temp;
+				}
+			}
+		}
+		float timeTemp = wInt.getTemperatureForBiome(world.getBiomeGenForCoords(pos));
+		timeTemp += timeTemp * (-Math.abs(64 - pos.getY()) / 64F);
+		if (maxTemp == Integer.MIN_VALUE) {
+			maxTemp = timeTemp;
+		}
+		else if ((maxTemp <= 0 && timeTemp < maxTemp) || (maxTemp > 0 && timeTemp > maxTemp)) {
+			maxTemp = timeTemp;
+		}
+		if (world.getBlockState(pos).getBlock().equals(Blocks.glass))
+			System.out.println(maxTemp);
+		temp[meta] = maxTemp;
+		return maxTemp;
 	}
 	
 	public void calcChunkTemp(World world, int posX, int posY) {

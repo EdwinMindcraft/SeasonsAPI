@@ -3,6 +3,8 @@ package mod.mindcraft.seasons.asm;
 import static org.objectweb.asm.Opcodes.*;
 
 import java.util.Iterator;
+
+import mod.mindcraft.seasons.api.SeasonsAPI;
 import net.minecraft.launchwrapper.IClassTransformer;
 
 import org.objectweb.asm.ClassReader;
@@ -125,6 +127,9 @@ public class Transformer implements IClassTransformer {
 		else if (transformedName.equals("net.minecraft.block.BlockIce")) {
 			return transformBlockIce(basicClass);
 		}
+		else if (transformedName.equals("net.minecraft.block.BlockSnow")) {
+			return transformBlockSnow(basicClass);
+		}
 		return basicClass;
 	}
 	
@@ -142,7 +147,8 @@ public class Transformer implements IClassTransformer {
 				insn.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/SeasonsAPI", "instance", "Lmod/mindcraft/seasons/api/SeasonsAPI;"));
 				insn.add(new MethodInsnNode(INVOKEVIRTUAL, "mod/mindcraft/seasons/api/SeasonsAPI", "getWorldInterface", "()Lmod/mindcraft/seasons/api/IWorldInterface;", false));
 				insn.add(new VarInsnNode(ALOAD, 2));
-				insn.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/IWorldInterface", "getTemperature", obf ? "(Lcj;)F" : "(Lnet/minecraft/util/BlockPos;)F", true));
+				insn.add(new InsnNode(ICONST_1));
+				insn.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/IWorldInterface", "getTemperature", obf ? "(Lcj;Z)F" : "(Lnet/minecraft/util/BlockPos;Z)F", true));
 				insn.add(new InsnNode(FCONST_0));
 				insn.add(new InsnNode(FCMPL));
 				insn.add(new JumpInsnNode(IFLE, end));
@@ -166,6 +172,50 @@ public class Transformer implements IClassTransformer {
 			}
 		}
 		System.out.println("BlockIce patch complete!");
+		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+		cn.accept(cw);
+		return cw.toByteArray();
+	}
+	
+	private byte[] transformBlockSnow(byte[] basicClass) {
+		System.out.println("Starting BlockSnow Patch...");
+		ClassReader cr = new ClassReader(basicClass);
+		ClassNode cn = new ClassNode();
+		cr.accept(cn, 0);
+		for (MethodNode mn : cn.methods) {
+			if ((mn.name.equals("b") || mn.name.equals("updateTick")) && (mn.desc.equals("(Ladm;Lcj;Lalz;Ljava/util/Random;)V") || mn.desc.equals("(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V"))) {
+				boolean obf = mn.desc.equals("(Ladm;Lcj;Lalz;Ljava/util/Random;)V");
+				System.out.println("Patching updateTick...");
+				InsnList insn = new InsnList();
+				LabelNode end = new LabelNode();
+				insn.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/SeasonsAPI", "instance", "Lmod/mindcraft/seasons/api/SeasonsAPI;"));
+				insn.add(new MethodInsnNode(INVOKEVIRTUAL, "mod/mindcraft/seasons/api/SeasonsAPI", "getWorldInterface", "()Lmod/mindcraft/seasons/api/IWorldInterface;", false));
+				insn.add(new VarInsnNode(ALOAD, 2));
+				insn.add(new InsnNode(ICONST_1));
+				insn.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/IWorldInterface", "getTemperature", obf ? "(Lcj;Z)F" : "(Lnet/minecraft/util/BlockPos;Z)F", true));
+				insn.add(new InsnNode(FCONST_0));
+				insn.add(new InsnNode(FCMPL));
+				insn.add(new JumpInsnNode(IFLE, end));
+				
+				Iterator<AbstractInsnNode> iter = mn.instructions.iterator();
+				while (iter.hasNext()) {
+					AbstractInsnNode ain = iter.next();
+					if (ain instanceof JumpInsnNode && ain.getOpcode() == IF_ICMPLE) {
+						((JumpInsnNode)ain).setOpcode(IF_ICMPGT);
+						mn.instructions.insert(ain, insn);
+						while(iter.hasNext()) {
+							AbstractInsnNode ain2 = iter.next();
+							if (ain2 instanceof InsnNode && ain2.getOpcode() == RETURN) {
+								mn.instructions.insertBefore(ain2, end);
+								break;
+							}
+						}
+						break;
+					}
+				}
+			}
+		}
+		System.out.println("BlockSnow patch complete!");
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 		cn.accept(cw);
 		return cw.toByteArray();

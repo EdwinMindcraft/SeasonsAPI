@@ -14,6 +14,7 @@ public class SeasonsCFG extends Configuration {
 	public int hypothermiaLevelDiff;
 	public int burntStart;
 	public int burntDiff;
+	public boolean enableTempDebug;
 	
 	public SeasonsCFG(File file) {
 		super(file);
@@ -26,6 +27,7 @@ public class SeasonsCFG extends Configuration {
 		hypothermiaLevelDiff = getInt("Hypothermia Level Difference", "temperature", 5, 1, 1000, "Temperature between hypothermia levels - Hardcore Mode");
 		burntStart = getInt("Burnt Start", "temperature", 80, -1000, 1000, "At which temperature does burnt starts - Hardcore Mode");
 		burntDiff = getInt("Burnt Level Difference", "temperature", 100, 1, 1000, "Temperature between burnt levels - Hardcore Mode");
+		enableTempDebug = getBoolean("Enable Debug", "advanced", false, "Enable the temperature display in the debug screen");
 		save();
 	}
 	
@@ -39,6 +41,7 @@ public class SeasonsCFG extends Configuration {
 		hypothermiaLevelDiff = getInt("Hypothermia Level Difference", "temperature", 5, 1, 1000, "Temperature between hypothermia levels - Hardcore Mode");
 		burntStart = getInt("Burnt Start", "temperature", 80, -1000, 1000, "At which temperature does burnt starts - Hardcore Mode");
 		burntDiff = getInt("Burnt Level Difference", "temperature", 100, 1, 1000, "Temperature between burnt levels - Hardcore Mode");
+		enableTempDebug = getBoolean("Enable Debug", "advanced", false, "Enable the temperature display in the debug screen");
 		save();
 	}
 }

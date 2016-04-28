@@ -1,5 +1,6 @@
 package mod.mindcraft.seasons;
 
+import mod.mindcraft.seasons.api.IBlockTemperatureRegistry;
 import mod.mindcraft.seasons.api.SeasonPotion;
 import mod.mindcraft.seasons.api.SeasonsAPI;
 import mod.mindcraft.seasons.api.SeasonsCFG;
@@ -40,12 +41,16 @@ public class Seasons {
 	}
 	
 	private void addTemperatures() {
-		SeasonsAPI.instance.getBlockTemperatureRegistry().addTemperatureToBlock(Blocks.torch.getDefaultState(), 50F, true);
-		SeasonsAPI.instance.getBlockTemperatureRegistry().addTemperatureToBlock(Blocks.lit_pumpkin.getDefaultState(), 50F, true);
-		SeasonsAPI.instance.getBlockTemperatureRegistry().addTemperatureToBlock(Blocks.lit_furnace.getDefaultState(), 50F, true);
-		SeasonsAPI.instance.getBlockTemperatureRegistry().addTemperatureToBlock(Blocks.lava.getDefaultState(), 2000F, true);
-		SeasonsAPI.instance.getBlockTemperatureRegistry().addTemperatureToBlock(Blocks.flowing_lava.getDefaultState(), 2000F, true);
-		SeasonsAPI.instance.getBlockTemperatureRegistry().addTemperatureToBlock(Blocks.fire.getDefaultState(), 800F, true);				
+		IBlockTemperatureRegistry registry = SeasonsAPI.instance.getBlockTemperatureRegistry();
+		registry.addTemperatureToBlock(Blocks.torch.getDefaultState(), 50F, true);
+		registry.addTemperatureToBlock(Blocks.lit_pumpkin.getDefaultState(), 50F, true);
+		registry.addTemperatureToBlock(Blocks.lit_furnace.getDefaultState(), 50F, true);
+		registry.addTemperatureToBlock(Blocks.lava.getDefaultState(), 2000F, true);
+		registry.addTemperatureToBlock(Blocks.flowing_lava.getDefaultState(), 2000F, true);
+		registry.addTemperatureToBlock(Blocks.fire.getDefaultState(), 800F, true);
+		registry.addTemperatureToBlock(Blocks.ice.getDefaultState(), -10F, true);
+		registry.addTemperatureToBlock(Blocks.packed_ice.getDefaultState(), -20, true);
+		registry.addTemperatureToBlock(Blocks.snow.getDefaultState(), -5F, true);
 	}
 	
 }
