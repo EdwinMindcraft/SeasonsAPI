@@ -15,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -57,7 +58,7 @@ public class WorldHandler {
 	public void debugInfo(RenderGameOverlayEvent.Text e) {
 		float temp = (float) (Math.floor(SeasonsAPI.instance.getWorldInterface().getTemperature(Minecraft.getMinecraft().thePlayer.getPosition()) * 100) / 100);
 		if (SeasonsAPI.instance.getCfg().enableTempDebug && Minecraft.getMinecraft().gameSettings.showDebugInfo)
-			e.left.add("§c[SAPI]§r" + (temp < SeasonsAPI.instance.cfg.hypothermiaStart ? "§b" : (temp > SeasonsAPI.instance.cfg.burntStart ? "§4" : "")) + "Temperature : " + temp + " C");
+			e.left.add("\u00a7c[SAPI]\u00a7r" + (temp < SeasonsAPI.instance.cfg.hypothermiaStart ? "\u00a7b" : (temp > SeasonsAPI.instance.cfg.burntStart ? "\u00a74" : "")) + "Temperature : " + temp + " C");
 	}
 	
 	@SubscribeEvent
@@ -106,8 +107,9 @@ public class WorldHandler {
 		if (cfg.enableHardcoreTemperature) {
 			ChunkTemperature temp = tempMap.get(e.entityLiving.worldObj.getChunkFromBlockCoords(e.entityLiving.getPosition()).getChunkCoordIntPair());
 			try {
-				if (e.entityLiving instanceof EntityPlayer)
+				if (e.entityLiving instanceof EntityPlayer && e.entityLiving.ticksExisted % 10 == 0) {
 					tempMap.get(e.entityLiving.worldObj.getChunkFromBlockCoords(e.entityLiving.getPosition()).getChunkCoordIntPair()).calcBlockTemp(e.entityLiving.worldObj, e.entityLiving.getPosition());
+				}
 			} catch (Exception ex) {}
 			if (temp != null) {
 				if (temp.getTempForBlock(e.entityLiving.getPosition()) < cfg.hypothermiaStart) {

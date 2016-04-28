@@ -1,0 +1,12 @@
+1.0.1
+-Fixed Temperature in biomes
+-Ice and snow layer now melt if the biome is too hot
+-Crops have a chance to grow twice in spring
+-Crops grow way slower during winter
+-Added a temperature display (available through config)
+-Added Hypothermia under 0 C (Configurable)
+-Added Burnt over 80 C (Configurable)
+-Negative block temperature support
+
+1.0.0
+-Initial Release

@@ -4,9 +4,10 @@ import static org.objectweb.asm.Opcodes.*;
 
 import java.util.Iterator;
 
-import mod.mindcraft.seasons.api.SeasonsAPI;
 import net.minecraft.launchwrapper.IClassTransformer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -27,18 +28,20 @@ import com.google.common.collect.Lists;
 
 public class Transformer implements IClassTransformer {
 
+	private static final Logger logger = LogManager.getLogger("Season API Transformer");
+	
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		
 		if (transformedName.equals("net.minecraft.world.biome.BiomeGenBase")) {
-			System.out.println("Starting BiomeGenBase Patch...");
+			logger.info("Starting BiomeGenBase Patch...");
 			ClassReader cr = new ClassReader(basicClass);
 			ClassNode cn = new ClassNode();
 			cr.accept(cn, 0);
 			boolean obf = false;
 			for (MethodNode mn : cn.methods) {
 				if ((mn.name.equals("a") || mn.name.equals("getFloatTemperature")) && (mn.desc.equals("(Lcj;)F") || mn.desc.equals("(Lnet/minecraft/util/BlockPos;)F"))) {
-					System.out.println("Patching getFloatTemperature...");
+					logger.info("Patching getFloatTemperature...");
 					obf = mn.name.equals("a");
 					mn.instructions.clear();
 					mn.instructions.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/SeasonsAPI", "instance", "Lmod/mindcraft/seasons/api/SeasonsAPI;"));
@@ -49,7 +52,7 @@ public class Transformer implements IClassTransformer {
 				}
 			}
 			{
-				System.out.println("Adding isRainEnabled method...");
+				logger.info("Adding isRainEnabled method...");
 				MethodNode method = new MethodNode();
 				method.desc = "()Z";
 				method.name = "isRainEnabled";
@@ -60,21 +63,21 @@ public class Transformer implements IClassTransformer {
 				method.visitMaxs(0, 0);
 				cn.methods.add(method);
 			}
-			System.out.println("BiomeGenBase patch complete!");
+			logger.info("BiomeGenBase patch complete!");
 			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 			cn.accept(cw);
 			return cw.toByteArray();
 		}
 		
 		else if (transformedName.equals("net.minecraft.block.BlockLeaves") || transformedName.equals("net.minecraft.block.BlockOldLeaf")) {
-			System.out.println("Starting BlockLeaves Patch...");
+			logger.info("Starting BlockLeaves Patch...");
 			ClassReader cr = new ClassReader(basicClass);
 			ClassNode cn = new ClassNode();
 			cr.accept(cn, 0);
 			for (MethodNode mn : cn.methods) {
 				if ((mn.name.equals("a") || mn.name.equals("colorMultiplier")) && (mn.desc.equals("(Ladq;Lcj;I)I") || mn.desc.equals("(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/BlockPos;I)I"))) {
 					boolean obf = mn.name.equals("a");
-					System.out.println("Patching colorMultiplier...");
+					logger.info("Patching colorMultiplier...");
 					mn.instructions.clear();
 					mn.instructions.add(new VarInsnNode(ALOAD, 1));
 					mn.instructions.add(new VarInsnNode(ALOAD, 2));
@@ -82,27 +85,27 @@ public class Transformer implements IClassTransformer {
 					mn.instructions.add(new InsnNode(IRETURN));
 				}
 			}
-			System.out.println("BlockLeaves patch complete!");
+			logger.info("BlockLeaves patch complete!");
 			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 			cn.accept(cw);
 			return cw.toByteArray();
 		}
 		else if (transformedName.equals("net.minecraft.world.World")) {
-			System.out.println("Starting World Patch...");
+			logger.info("Starting World Patch...");
 			ClassReader cr = new ClassReader(basicClass);
 			ClassNode cn = new ClassNode();
 			cr.accept(cn, 0);
 			for (MethodNode mn : cn.methods) {
 				if ((mn.name.equals("canSnowAtBody")) && (mn.desc.equals("(Lcj;Z)Z") || mn.desc.equals("(Lnet/minecraft/util/BlockPos;Z)Z"))) {
 					boolean obf = mn.desc.equals("(Lcj;Z)Z");
-					System.out.println("Patching canSnowAtBody...");
+					logger.info("Patching canSnowAtBody...");
 					InsnList insn = new InsnList();
 					insn.add(new VarInsnNode(ALOAD, 0));
 					insn.add(new VarInsnNode(ALOAD, 1));
 					insn.add(new MethodInsnNode(INVOKEVIRTUAL, obf ? "adm" : "net/minecraft/world/World", obf ? "b" : "getBiomeGenForCoords", obf ?  "(Lcj;)Lady;" : "(Lnet/minecraft/util/BlockPos;)Lnet/minecraft/world/biome/BiomeGenBase;", false));
 					insn.add(new MethodInsnNode(INVOKEVIRTUAL, obf ? "ady" : "net/minecraft/world/biome/BiomeGenBase", "isRainEnabled", "()Z", false));
 					LabelNode lb = new LabelNode();
-					insn.add(new JumpInsnNode(IFEQ, lb));
+					insn.add(new JumpInsnNode(IFNE, lb));
 					insn.add(new InsnNode(ICONST_0));
 					insn.add(new InsnNode(IRETURN));
 					insn.add(lb);
@@ -116,7 +119,7 @@ public class Transformer implements IClassTransformer {
 					}
 				}
 			}
-			System.out.println("World patch complete!");
+			logger.info("World patch complete!");
 			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 			cn.accept(cw);
 			return cw.toByteArray();			
@@ -134,14 +137,14 @@ public class Transformer implements IClassTransformer {
 	}
 	
 	private byte[] transformBlockIce(byte[] basicClass) {
-		System.out.println("Starting BlockIce Patch...");
+		logger.info("Starting BlockIce Patch...");
 		ClassReader cr = new ClassReader(basicClass);
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
 		for (MethodNode mn : cn.methods) {
 			if ((mn.name.equals("b") || mn.name.equals("updateTick")) && (mn.desc.equals("(Ladm;Lcj;Lalz;Ljava/util/Random;)V") || mn.desc.equals("(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V"))) {
 				boolean obf = mn.desc.equals("(Ladm;Lcj;Lalz;Ljava/util/Random;)V");
-				System.out.println("Patching updateTick...");
+				logger.info("Patching updateTick...");
 				InsnList insn = new InsnList();
 				LabelNode end = new LabelNode();
 				insn.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/SeasonsAPI", "instance", "Lmod/mindcraft/seasons/api/SeasonsAPI;"));
@@ -171,21 +174,21 @@ public class Transformer implements IClassTransformer {
 				}
 			}
 		}
-		System.out.println("BlockIce patch complete!");
+		logger.info("BlockIce patch complete!");
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 		cn.accept(cw);
 		return cw.toByteArray();
 	}
 	
 	private byte[] transformBlockSnow(byte[] basicClass) {
-		System.out.println("Starting BlockSnow Patch...");
+		logger.info("Starting BlockSnow Patch...");
 		ClassReader cr = new ClassReader(basicClass);
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
 		for (MethodNode mn : cn.methods) {
 			if ((mn.name.equals("b") || mn.name.equals("updateTick")) && (mn.desc.equals("(Ladm;Lcj;Lalz;Ljava/util/Random;)V") || mn.desc.equals("(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V"))) {
 				boolean obf = mn.desc.equals("(Ladm;Lcj;Lalz;Ljava/util/Random;)V");
-				System.out.println("Patching updateTick...");
+				logger.info("Patching updateTick...");
 				InsnList insn = new InsnList();
 				LabelNode end = new LabelNode();
 				insn.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/SeasonsAPI", "instance", "Lmod/mindcraft/seasons/api/SeasonsAPI;"));
@@ -215,20 +218,20 @@ public class Transformer implements IClassTransformer {
 				}
 			}
 		}
-		System.out.println("BlockSnow patch complete!");
+		logger.info("BlockSnow patch complete!");
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 		cn.accept(cw);
 		return cw.toByteArray();
 	}
 	
 	private byte[] transformBlockCrops(byte[] basicClass) {
-		System.out.println("Starting BlockCrops Patch...");
+		logger.info("Starting BlockCrops Patch...");
 		ClassReader cr = new ClassReader(basicClass);
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
 		for (MethodNode mn : cn.methods) {
 			if ((mn.name.equals("b") || mn.name.equals("updateTick")) && (mn.desc.equals("(Ladm;Lcj;Lalz;Ljava/util/Random;)V") || mn.desc.equals("(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V"))) {
-				System.out.println("Patching updateTick...");
+				logger.info("Patching updateTick...");
 				InsnList insn = new InsnList();
 				insn.add(new LabelNode());
 				insn.add(new IincInsnNode(5, 1));
@@ -294,7 +297,7 @@ public class Transformer implements IClassTransformer {
 				}
 			}
 		}
-		System.out.println("BlockCrops patch complete!");
+		logger.info("BlockCrops patch complete!");
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 		cn.accept(cw);
 		return cw.toByteArray();

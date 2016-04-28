@@ -51,12 +51,8 @@ public class WorldInterface implements IWorldInterface {
 			return 0F;
 		if (WorldHandler.tempMap == null)
 			WorldHandler.tempMap = new HashMap<ChunkCoordIntPair, ChunkTemperature>();
-		float timeMultiplier = (-(float)((getWorld().getWorldTime() + 6000) % 24000) / 12000F) + 1F;
-//		timeMultiplier += 0.5F;
-//		if (timeMultiplier < -1F)
-//			timeMultiplier += 1F;
-//		if (timeMultiplier > 1F)
-//			timeMultiplier -= 1F;
+		float timeMultiplier = -(Math.abs(12000 - ((worldObj.getWorldTime() + 6000) % 24000))) / 6000F;
+		timeMultiplier++;
 		if (external) {
 			try {
 				if (!getWorld().getChunkProvider().chunkExists((int)Math.floor((float)pos.getX() / 16F), (int)Math.floor((float)pos.getZ() / 16F)))
