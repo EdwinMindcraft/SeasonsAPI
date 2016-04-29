@@ -5,7 +5,7 @@ import mod.mindcraft.seasons.api.interfaces.IBlockTemperatureRegistry;
 import mod.mindcraft.seasons.api.interfaces.IWorldInterface;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
 
@@ -61,8 +61,6 @@ public class ChunkTemperature {
 					if (dist == 0 || dist > 5)
 						continue;
 					BlockPos newPos = pos.add(x, y, z);
-					if (!provider.chunkExists((int)Math.floor((float)newPos.getX() / 16F), (int)Math.floor((float)newPos.getZ() / 16F)))
-						continue;
 					if (world.isAirBlock(newPos))
 						continue;
 					float temp = tempReg.getTemperatureForBlock(world.getBlockState(newPos));

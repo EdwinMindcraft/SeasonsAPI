@@ -12,8 +12,8 @@ import net.minecraft.block.BlockCrops;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -32,20 +32,20 @@ public class WorldHandler {
 	
 	@SubscribeEvent
 	public void onBlockUpdate(BlockEvent.NeighborNotifyEvent e) {
-		BlockPos pos = e.pos;
+		BlockPos pos = e.getPos();
 		try {
-			if ((e.state.getBlock() instanceof ITemperatureUpdater ? !SeasonsAPI.instance.getBlockTemperatureRegistry().hasTemperature(e.state) : !((ITemperatureUpdater)e.state.getBlock()).requiresTemperatureUpdate(e.world, e.state, e.pos)))
+			if ((e.getState().getBlock() instanceof ITemperatureUpdater ? !SeasonsAPI.instance.getBlockTemperatureRegistry().hasTemperature(e.getState()) : !((ITemperatureUpdater)e.getState().getBlock()).requiresTemperatureUpdate(e.getWorld(), e.getState(), e.getPos())))
 				return;
-			if (!tempMap.containsKey(new ChunkCoordIntPair((int)Math.floor((float)e.pos.getX() / 16F), (int)Math.floor((float)e.pos.getZ() / 16F))))
+			if (!tempMap.containsKey(new ChunkCoordIntPair((int)Math.floor((float)e.getPos().getX() / 16F), (int)Math.floor((float)e.getPos().getZ() / 16F))))
 				return;
 
-			tempMap.get(e.world.getChunkFromBlockCoords(pos).getChunkCoordIntPair()).calcBlockTemp(e.world, pos);
+			tempMap.get(e.getWorld().getChunkFromBlockCoords(pos).getChunkCoordIntPair()).calcBlockTemp(e.getWorld(), pos);
 		} catch (Exception ex) {}
 	}
 	
 	@SubscribeEvent
 	public void onCropsUpdate(CropsUpdateEvent e) {
-		if (e.world.getLightFromNeighbors(e.pos.up()) >= 9) {
+		if (e.getWorld().getLightFromNeighbors(e.getPos().up()) >= 9) {
 			int i = ((Integer)e.state.getValue(BlockCrops.AGE)).intValue();
 			if (i < 7) {
 				Random rand = new Random();
@@ -82,7 +82,7 @@ public class WorldHandler {
 				}
 				i = MathHelper.clamp_int(i + bonusStage, 0, 7);
 				e.state = e.state.withProperty(BlockCrops.AGE, i);
-				e.world.setBlockState(e.pos, e.state);
+				e.getWorld().setBlockState(e.getPos(), e.state);
 			}
 		}
 	}
@@ -92,27 +92,27 @@ public class WorldHandler {
 		if (SeasonsAPI.instance.getCfg().enableTempDebug && Minecraft.getMinecraft().gameSettings.showDebugInfo) {
 			EntityPlayer p = Minecraft.getMinecraft().thePlayer;
 			float temp = (float) (Math.floor(SeasonsAPI.instance.getWorldInterface().getTemperature(new BlockPos(p.posX, p.posY, p.posZ)) * 100) / 100);
-			e.left.add("\u00a7c[SAPI]\u00a7r" + (temp < SeasonsAPI.instance.cfg.hypothermiaStart ? "\u00a7b" : (temp > SeasonsAPI.instance.cfg.burntStart ? "\u00a74" : "")) + "External Temperature : " + temp + " C");
+			e.getLeft().add("\u00a7c[SAPI]\u00a7r" + (temp < SeasonsAPI.instance.cfg.hypothermiaStart ? "\u00a7b" : (temp > SeasonsAPI.instance.cfg.burntStart ? "\u00a74" : "")) + "External Temperature : " + temp + " C");
 			temp =(float) (Math.floor(SeasonsAPI.instance.getWorldInterface().getInternalTemperature(p) * 100) / 100);
-			e.left.add("\u00a7c[SAPI]\u00a7r" + (temp < SeasonsAPI.instance.cfg.hypothermiaStart ? "\u00a7b" : (temp > SeasonsAPI.instance.cfg.burntStart ? "\u00a74" : "")) + "Internal Temperature : " + temp + " C");
-			e.left.add("\u00a7c[SAPI]\u00a7rChunks in temperature map : " + tempMap.size());
+			e.getLeft().add("\u00a7c[SAPI]\u00a7r" + (temp < SeasonsAPI.instance.cfg.hypothermiaStart ? "\u00a7b" : (temp > SeasonsAPI.instance.cfg.burntStart ? "\u00a74" : "")) + "Internal Temperature : " + temp + " C");
+			e.getLeft().add("\u00a7c[SAPI]\u00a7rChunks in temperature map : " + tempMap.size());
 			if (!SeasonsAPI.instance.getCfg().seasonAlwaysVisible) {
 				long seasonLenght = 24000 * SeasonsAPI.instance.getCfg().seasonLenght;
-				e.left.add("\u00a7c[SAPI]\u00a7rSeason : " + StringUtils.capitalize(SeasonsAPI.instance.getWorldInterface().getSeason().name().toLowerCase()) + " (" + (Math.floor((float)(Minecraft.getMinecraft().theWorld.getWorldTime() % seasonLenght) * 1000F / (float)seasonLenght) / 10F) + "%)");			
+				e.getLeft().add("\u00a7c[SAPI]\u00a7rSeason : " + StringUtils.capitalize(SeasonsAPI.instance.getWorldInterface().getSeason().name().toLowerCase()) + " (" + (Math.floor((float)(Minecraft.getMinecraft().theWorld.getWorldTime() % seasonLenght) * 1000F / (float)seasonLenght) / 10F) + "%)");			
 			}
 		}
 		if (SeasonsAPI.instance.getCfg().seasonAlwaysVisible) {
 			long seasonLenght = 24000 * SeasonsAPI.instance.getCfg().seasonLenght;
-			e.left.add("Season : " + StringUtils.capitalize(SeasonsAPI.instance.getWorldInterface().getSeason().name().toLowerCase()) + " (" + (Math.floor((float)(Minecraft.getMinecraft().theWorld.getWorldTime() % seasonLenght) * 1000F / (float)seasonLenght) / 10F) + "%)");
+			e.getLeft().add("Season : " + StringUtils.capitalize(SeasonsAPI.instance.getWorldInterface().getSeason().name().toLowerCase()) + " (" + (Math.floor((float)(Minecraft.getMinecraft().theWorld.getWorldTime() % seasonLenght) * 1000F / (float)seasonLenght) / 10F) + "%)");
 			long year = (long) Math.floor((float)(((WorldInterface)SeasonsAPI.instance.getWorldInterface()).getWorld().getWorldTime() / ((float)seasonLenght * 4)));
 			long yearTime = (long) Math.floor(((float)((WorldInterface)SeasonsAPI.instance.getWorldInterface()).getWorld().getWorldTime() % ((float)seasonLenght * 4)) / 24000F);
-			e.left.add("Year " + year + " Day " + yearTime);
+			e.getLeft().add("Year " + year + " Day " + yearTime);
 		}
 	}
 	
 	@SubscribeEvent
 	public void worldLoad(WorldEvent.Load e) {
-		((WorldInterface)SeasonsAPI.instance.getWorldInterface()).setWorld(e.world);
+		((WorldInterface)SeasonsAPI.instance.getWorldInterface()).setWorld(e.getWorld());
 	}
 	
 	@SubscribeEvent
@@ -124,7 +124,7 @@ public class WorldHandler {
 	
 	@SubscribeEvent
 	public void onConfigChanged (ConfigChangedEvent e) {
-		if (!e.modID.equals("seasonsapi"))
+		if (!e.getModID().equals("seasonsapi"))
 			return;
 		SeasonsCFG cfg = SeasonsAPI.instance.cfg;
 		cfg.save();
@@ -134,27 +134,27 @@ public class WorldHandler {
 	
 	@SubscribeEvent
 	public void livingTick (LivingUpdateEvent e) {
-		BlockPos pos = new BlockPos(e.entityLiving.posX, e.entityLiving.posY, e.entityLiving.posZ);
+		BlockPos pos = new BlockPos(e.getEntityLiving().posX, e.getEntityLiving().posY, e.getEntityLiving().posZ);
 		SeasonsCFG cfg = SeasonsAPI.instance.getCfg();
-		World world = e.entityLiving.worldObj;
-		if (e.entityLiving.isPotionActive(Seasons.HYPOTHERMIA)) {
-			PotionEffect hypothermia = e.entityLiving.getActivePotionEffect(Seasons.HYPOTHERMIA);
-			e.entityLiving.motionX -= e.entityLiving.motionX * (((double)hypothermia.getAmplifier() + 1D) * 0.10);
-			e.entityLiving.motionZ -= e.entityLiving.motionZ * (((double)hypothermia.getAmplifier() + 1D) * 0.10);
-			if (hypothermia.getAmplifier() > 0 && e.entityLiving.ticksExisted % 20 == 0)
-				e.entityLiving.attackEntityFrom(DamageSources.hypothermia, hypothermia.getAmplifier());
+		World world = e.getEntityLiving().worldObj;
+		if (e.getEntityLiving().isPotionActive(Seasons.HYPOTHERMIA)) {
+			PotionEffect hypothermia = e.getEntityLiving().getActivePotionEffect(Seasons.HYPOTHERMIA);
+			e.getEntityLiving().motionX -= e.getEntityLiving().motionX * (((double)hypothermia.getAmplifier() + 1D) * 0.10);
+			e.getEntityLiving().motionZ -= e.getEntityLiving().motionZ * (((double)hypothermia.getAmplifier() + 1D) * 0.10);
+			if (hypothermia.getAmplifier() > 0 && e.getEntityLiving().ticksExisted % 20 == 0)
+				e.getEntityLiving().attackEntityFrom(DamageSources.hypothermia, hypothermia.getAmplifier());
 		}
-		if (e.entityLiving.isPotionActive(Seasons.BURNT)) {
-			PotionEffect burnt = e.entityLiving.getActivePotionEffect(Seasons.BURNT);
+		if (e.getEntityLiving().isPotionActive(Seasons.BURNT)) {
+			PotionEffect burnt = e.getEntityLiving().getActivePotionEffect(Seasons.BURNT);
 			Random rand = new Random();
 			if (rand.nextFloat() < (0.01F * (burnt.getAmplifier() + 1)))
-				e.entityLiving.setFire(2 + burnt.getAmplifier());
-			if (burnt.getAmplifier() > 0 && e.entityLiving.ticksExisted % 20 == 0)
-				e.entityLiving.attackEntityFrom(DamageSources.burnt, burnt.getAmplifier());
+				e.getEntityLiving().setFire(2 + burnt.getAmplifier());
+			if (burnt.getAmplifier() > 0 && e.getEntityLiving().ticksExisted % 20 == 0)
+				e.getEntityLiving().attackEntityFrom(DamageSources.burnt, burnt.getAmplifier());
 		}
 		
-		if (e.entityLiving instanceof EntityPlayer) {
-			EntityPlayer player = (EntityPlayer)e.entityLiving;
+		if (e.getEntityLiving() instanceof EntityPlayer) {
+			EntityPlayer player = (EntityPlayer)e.getEntityLiving();
 			if (cfg.enableHardcoreTemperature) {
 				try {
 					tempMap.get(world.getChunkFromBlockCoords(pos).getChunkCoordIntPair()).calcBlockTemp(world, pos);
@@ -162,21 +162,21 @@ public class WorldHandler {
 				float temp = SeasonsAPI.instance.getWorldInterface().getInternalTemperature(player);
 				if (temp < cfg.hypothermiaStart) {
 					int hypothermiaLevel = (int) Math.floor(Math.abs(temp - cfg.hypothermiaStart) / (float)cfg.hypothermiaLevelDiff);
-					player.removePotionEffect(Seasons.HYPOTHERMIA.id);
-					player.addPotionEffect(new PotionEffect(Seasons.HYPOTHERMIA.id, 201, hypothermiaLevel, true, false));
-					if (player.isPotionActive(Seasons.BURNT.id))
-						player.removePotionEffect(Seasons.BURNT.id);
+					player.removePotionEffect(Seasons.HYPOTHERMIA);
+					player.addPotionEffect(new PotionEffect(Seasons.HYPOTHERMIA, 201, hypothermiaLevel, true, false));
+					if (player.isPotionActive(Seasons.BURNT))
+						player.removePotionEffect(Seasons.BURNT);
 				} else if (temp > cfg.burntStart) {
 					int burntLevel = (int) Math.floor(Math.abs(temp - cfg.burntStart) / (float)cfg.burntDiff);
-					player.removePotionEffect(Seasons.BURNT.id);
-					player.addPotionEffect(new PotionEffect(Seasons.BURNT.id, 200, burntLevel));
+					player.removePotionEffect(Seasons.BURNT);
+					player.addPotionEffect(new PotionEffect(Seasons.BURNT, 200, burntLevel));
 				} else {
 					PotionEffect hypothermia = player.getActivePotionEffect(Seasons.HYPOTHERMIA);
 					PotionEffect burnt = player.getActivePotionEffect(Seasons.BURNT);
 					if (hypothermia != null && hypothermia.getIsAmbient())
-						player.removePotionEffect(Seasons.HYPOTHERMIA.id);
+						player.removePotionEffect(Seasons.HYPOTHERMIA);
 					if (burnt != null && player.isWet())
-						player.removePotionEffect(Seasons.BURNT.id);
+						player.removePotionEffect(Seasons.BURNT);
 				}
 			}
 		}

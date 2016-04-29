@@ -2,7 +2,7 @@ package mod.mindcraft.seasons.api.utils;
 
 import mod.mindcraft.seasons.api.event.CropsUpdateEvent;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 

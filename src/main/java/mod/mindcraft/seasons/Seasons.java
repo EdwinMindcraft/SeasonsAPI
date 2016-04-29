@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @Mod(modid="seasonsapi", version="1.0.3", acceptedMinecraftVersions="1.8.9", modLanguage="java", guiFactory="mod.mindcraft.seasons.ConfigFactory", canBeDeactivated=false)
 public class Seasons {
@@ -22,11 +23,13 @@ public class Seasons {
 	@Instance("seasonsapi")
 	public static Seasons instance;
 	
-	public static final Potion HYPOTHERMIA = new SeasonPotion(new ResourceLocation("seasonsapi", "hyporthermia"), true, 0x00ffff).setPotionName("seasons:hypothermia");
-	public static final Potion BURNT = new SeasonPotion(new ResourceLocation("seasonsapi", "burnt"), true, 0x990000).setPotionName("seasons:burnt");
+	public static final Potion HYPOTHERMIA = new SeasonPotion(true, 0x00ffff).setPotionName("seasons:hypothermia");
+	public static final Potion BURNT = new SeasonPotion(true, 0x990000).setPotionName("seasons:burnt");
 		
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent e) {
+		GameRegistry.register(HYPOTHERMIA, new ResourceLocation("seasonsapi", "hyporthermia"));
+		GameRegistry.register(BURNT, new ResourceLocation("seasonsapi", "burnt"));
 		SeasonsAPI.instance.setCfg(new SeasonsCFG(e.getSuggestedConfigurationFile()));
 		SeasonsAPI.instance.setWorldInterface(new WorldInterface());
 		SeasonsAPI.instance.setBlockTemperatureRegistry(new BlockTemperatureRegistry());

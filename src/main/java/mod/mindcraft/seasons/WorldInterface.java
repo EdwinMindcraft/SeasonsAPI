@@ -8,7 +8,7 @@ import mod.mindcraft.seasons.api.interfaces.ITemperatureModifier;
 import mod.mindcraft.seasons.api.interfaces.IWorldInterface;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -56,11 +56,9 @@ public class WorldInterface implements IWorldInterface {
 		timeMultiplier++;
 		if (external) {
 			try {
-				if (!getWorld().getChunkProvider().chunkExists((int)Math.floor((float)pos.getX() / 16F), (int)Math.floor((float)pos.getZ() / 16F)))
-					return 0;
 				float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).calcBlockExternalTemp(worldObj, newPos);
 				temp += getSeason().temperatureDif;
-				temp += (getWorld().getBiomeGenForCoords(pos).temperature * 12.5F * timeMultiplier);
+				temp += (getWorld().getBiomeGenForCoords(pos).getTemperature() * 12.5F * timeMultiplier);
 				if (!getWorld().canBlockSeeSky(pos)) temp /= 1.5;
 				return temp > 0 ? temp * getSeason().temperatureMultiplier : temp * getSeason().getOpposite().temperatureMultiplier;
 			} catch (NullPointerException e) {
@@ -69,17 +67,15 @@ public class WorldInterface implements IWorldInterface {
 				WorldHandler.tempMap.put(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair(), temp);
 				float temp2 = temp.getTempForBlock(newPos);
 				temp2 += getSeason().temperatureDif;
-				temp2 += (getWorld().getBiomeGenForCoords(pos).temperature * 12.5F * timeMultiplier);
+				temp2 += (getWorld().getBiomeGenForCoords(pos).getTemperature() * 12.5F * timeMultiplier);
 				if (!getWorld().canBlockSeeSky(pos)) temp2 /= 1.5;
 				return temp2 > 0 ? temp2 * getSeason().temperatureMultiplier : temp2 * getSeason().getOpposite().temperatureMultiplier;
 			}			
 		} else {
 			try {
-				if (!getWorld().getChunkProvider().chunkExists((int)Math.floor((float)pos.getX() / 16F), (int)Math.floor((float)pos.getZ() / 16F)))
-					return 0;
 				float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).getTempForBlock(newPos);
 				temp += getSeason().temperatureDif;
-				temp += (getWorld().getBiomeGenForCoords(pos).temperature * 12.5F * timeMultiplier);
+				temp += (getWorld().getBiomeGenForCoords(pos).getTemperature() * 12.5F * timeMultiplier);
 				if (!getWorld().canBlockSeeSky(pos)) temp /= 1.5;
 				return temp > 0 ? temp * getSeason().temperatureMultiplier : temp * getSeason().getOpposite().temperatureMultiplier;
 			} catch (NullPointerException e) {
@@ -88,7 +84,7 @@ public class WorldInterface implements IWorldInterface {
 				WorldHandler.tempMap.put(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair(), temp);
 				float temp2 = temp.getTempForBlock(newPos);
 				temp2 += getSeason().temperatureDif;
-				temp2 += (getWorld().getBiomeGenForCoords(pos).temperature * 12.5F * timeMultiplier);
+				temp2 += (getWorld().getBiomeGenForCoords(pos).getTemperature() * 12.5F * timeMultiplier);
 				if (!getWorld().canBlockSeeSky(pos)) temp2 /= 1.5;
 				return temp2 > 0 ? temp2 * getSeason().temperatureMultiplier : temp2 * getSeason().getOpposite().temperatureMultiplier;
 			}
@@ -102,12 +98,12 @@ public class WorldInterface implements IWorldInterface {
 	
 	@Override
 	public float getTemperatureForBiome(BiomeGenBase biome) {
-		return 25F * (biome.temperature - 0.15F);
+		return 25F * (biome.getTemperature() - 0.15F);
 	}
 
 	@Override
 	public float getTemperatureFromTime(BiomeGenBase biome, long time) {
-		float temp = getTemperatureForBiome(biome) + (biome.temperature * 25F * ((float)((time + 12000) % 24000 - 12000) / 12000F));
+		float temp = getTemperatureForBiome(biome) + (biome.getTemperature() * 25F * ((float)((time + 12000) % 24000 - 12000) / 12000F));
 		return temp > 0 ? temp * getSeason().temperatureMultiplier : temp * getSeason().getOpposite().temperatureMultiplier;
 	}
 

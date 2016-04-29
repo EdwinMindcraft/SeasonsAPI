@@ -1,6 +1,22 @@
 package mod.mindcraft.seasons.asm;
 
-import static org.objectweb.asm.Opcodes.*;
+import static org.objectweb.asm.Opcodes.ALOAD;
+import static org.objectweb.asm.Opcodes.ASTORE;
+import static org.objectweb.asm.Opcodes.FCMPL;
+import static org.objectweb.asm.Opcodes.FRETURN;
+import static org.objectweb.asm.Opcodes.GETFIELD;
+import static org.objectweb.asm.Opcodes.GETSTATIC;
+import static org.objectweb.asm.Opcodes.ICONST_0;
+import static org.objectweb.asm.Opcodes.ICONST_1;
+import static org.objectweb.asm.Opcodes.IFLE;
+import static org.objectweb.asm.Opcodes.IFNE;
+import static org.objectweb.asm.Opcodes.IF_ICMPGT;
+import static org.objectweb.asm.Opcodes.IF_ICMPLE;
+import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static org.objectweb.asm.Opcodes.IRETURN;
+import static org.objectweb.asm.Opcodes.RETURN;
 
 import java.util.Iterator;
 
@@ -34,7 +50,7 @@ public class Transformer implements IClassTransformer {
 		if (transformedName.equals("net.minecraft.world.biome.BiomeGenBase")) {
 			return transformBiomeGenBase(basicClass);
 		}
-		else if (transformedName.equals("net.minecraft.block.BlockLeaves") || transformedName.equals("net.minecraft.block.BlockOldLeaf")) {
+		else if (transformedName.equals("net.minecraft.client.renderer.color.BlockColors$4") || transformedName.equals("net.minecraft.client.renderer.color.BlockColors$5")) {
 			return transformBlockLeaves(basicClass);
 		}
 		else if (transformedName.equals("net.minecraft.world.World")) {
@@ -49,14 +65,8 @@ public class Transformer implements IClassTransformer {
 		else if (transformedName.equals("net.minecraft.block.BlockSnow")) {
 			return transformBlockSnow(basicClass);
 		}
-		else if (transformedName.equals("net.minecraft.block.BlockGrass")) {
-			return transformBlockGrass(basicClass, "BlockGrass");
-		}
-		else if (transformedName.equals("net.minecraft.block.BlockTallGrass")) {
-			return transformBlockGrass(basicClass, "BlockTallGrass");
-		}
-		else if (transformedName.equals("net.minecraft.block.BlockDoublePlant")) {
-			return transformBlockGrass(basicClass, "BlockDoublePlant");
+		else if (transformedName.equals("net.minecraft.client.renderer.color.BlockColors$3") || transformedName.equals("net.minecraft.client.renderer.color.BlockColors$1") || transformedName.equals("net.minecraft.client.renderer.color.BlockColors$10")) {
+			return transformBlockGrass(basicClass);
 		}
 		return basicClass;
 	}
@@ -67,16 +77,35 @@ public class Transformer implements IClassTransformer {
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
 		boolean obf = false;
+		InsnList oldInsn = new InsnList();
 		for (MethodNode mn : cn.methods) {
-			if ((mn.name.equals("a") || mn.name.equals("getFloatTemperature")) && (mn.desc.equals("(Lcj;)F") || mn.desc.equals("(Lnet/minecraft/util/BlockPos;)F"))) {
+			if ((mn.name.equals("a") || mn.name.equals("getFloatTemperature")) && (mn.desc.equals("(Lcj;)F") || mn.desc.equals("(Lnet/minecraft/util/math/BlockPos;)F"))) {
 				logger.info("Patching getFloatTemperature...");
 				obf = mn.name.equals("a");
+				oldInsn = mn.instructions;
 				mn.instructions.clear();
 				mn.instructions.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/SeasonsAPI", "instance", "Lmod/mindcraft/seasons/api/SeasonsAPI;"));
 				mn.instructions.add(new MethodInsnNode(INVOKEVIRTUAL, "mod/mindcraft/seasons/api/SeasonsAPI", "getWorldInterface", "()Lmod/mindcraft/seasons/api/interfaces/IWorldInterface;", false));
 				mn.instructions.add(new VarInsnNode(ALOAD, 1));
-				mn.instructions.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/interfaces/IWorldInterface", "getTemperature", "(L" + (obf ? "cj" : "net/minecraft/util/BlockPos") + ";)F", true));
+				mn.instructions.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/interfaces/IWorldInterface", "getTemperature", "(L" + (obf ? "cj" : "net/minecraft/util/math/BlockPos") + ";)F", true));
 				mn.instructions.add(new InsnNode(FRETURN));
+			}
+			if ((mn.name.equals("b") || mn.name.equals("generateBiomeTerrain")) && (mn.desc.equals("(Ladm;Ljava/util/Random;Lans;IID)V") || mn.desc.equals("(Lnet/minecraft/world/World;Ljava/util/Random;Lnet/minecraft/world/chunk/ChunkPrimer;IID)V"))) {
+				obf = mn.name.equals("b");	
+				InsnList newInsn = new InsnList();
+				Iterator<AbstractInsnNode> iter = mn.instructions.iterator();
+				while (iter.hasNext()) {
+					AbstractInsnNode ain = (AbstractInsnNode) iter.next();
+					if (ain instanceof MethodInsnNode) {
+						MethodInsnNode min = (MethodInsnNode) ain;
+						if ((min.desc.equals("(Lcj;)F") || min.desc.equals("(Lnet/minecraft/util/math/BlockPos;)F")) && (min.name.equals("a") || min.name.equals("getFloatTemperature")) && (min.owner.equals("aig") || min.owner.equals("net/minecraft/world/biome/BiomeGenBase"))) {
+							min.name = "getFloatTemperature_old";
+							ain = min;
+						}
+					}
+					newInsn.add(ain);
+				}
+				mn.instructions = newInsn;
 			}
 		}
 		{
@@ -86,8 +115,18 @@ public class Transformer implements IClassTransformer {
 			method.name = "isRainEnabled";
 			method.exceptions = Lists.newArrayList();
 			method.instructions.add(new VarInsnNode(ALOAD, 0));
-			method.instructions.add(new FieldInsnNode(GETFIELD, obf ? "ady" : "net/minecraft/world/biome/BiomeGenBase", obf ? "ay" : "enableRain", "Z"));
+			method.instructions.add(new FieldInsnNode(GETFIELD, obf ? "aig" : "net/minecraft/world/biome/BiomeGenBase", obf ? "Q" : "enableRain", "Z"));
 			method.instructions.add(new InsnNode(IRETURN));
+			method.visitMaxs(0, 0);
+			cn.methods.add(method);
+		}
+		{
+			logger.info("Readding getFloatTemperature method...");
+			MethodNode method = new MethodNode();
+			method.desc = obf ? "(Lcj;)F" : "(Lnet/minecraft/util/math/BlockPos;)F";
+			method.name = "getFloatTemperature_old";
+			method.exceptions = Lists.newArrayList();
+			method.instructions = oldInsn;
 			method.visitMaxs(0, 0);
 			cn.methods.add(method);
 		}
@@ -103,13 +142,14 @@ public class Transformer implements IClassTransformer {
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
 		for (MethodNode mn : cn.methods) {
-			if ((mn.name.equals("a") || mn.name.equals("colorMultiplier")) && (mn.desc.equals("(Ladq;Lcj;I)I") || mn.desc.equals("(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/BlockPos;I)I"))) {
+			if ((mn.name.equals("a") || mn.name.equals("colorMultiplier")) && (mn.desc.equals("(Larc;Lahx;Lcj;I)I") || mn.desc.equals("(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;I)I"))) {
 				boolean obf = mn.name.equals("a");
 				logger.info("Patching colorMultiplier...");
 				mn.instructions.clear();
 				mn.instructions.add(new VarInsnNode(ALOAD, 1));
 				mn.instructions.add(new VarInsnNode(ALOAD, 2));
-				mn.instructions.add(new MethodInsnNode(INVOKESTATIC, "mod/mindcraft/seasons/colorizer/LeavesGrassUtils", "getLeavesColor", obf ? "(Ladq;Lcj;)I" : "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/BlockPos;)I", false));
+				mn.instructions.add(new VarInsnNode(ALOAD, 3));
+				mn.instructions.add(new MethodInsnNode(INVOKESTATIC, "mod/mindcraft/seasons/colorizer/LeavesGrassUtils", "getLeavesColor", obf ? "(Larc;Lahx;Lcj;)I" : "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)I", false));
 				mn.instructions.add(new InsnNode(IRETURN));
 			}
 		}
@@ -119,23 +159,24 @@ public class Transformer implements IClassTransformer {
 		return cw.toByteArray();
 	}
 	
-	private byte[] transformBlockGrass(byte[] basicClass, String clazz) {
-		logger.info("Starting " + clazz + " Patch...");
+	private byte[] transformBlockGrass(byte[] basicClass) {
+		logger.info("Starting Grass Patch...");
 		ClassReader cr = new ClassReader(basicClass);
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
 		for (MethodNode mn : cn.methods) {
-			if ((mn.name.equals("a") || mn.name.equals("colorMultiplier")) && (mn.desc.equals("(Ladq;Lcj;I)I") || mn.desc.equals("(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/BlockPos;I)I"))) {
+			if ((mn.name.equals("a") || mn.name.equals("colorMultiplier")) && (mn.desc.equals("(Larc;Lahx;Lcj;I)I") || mn.desc.equals("(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;I)I"))) {
 				boolean obf = mn.name.equals("a");
 				logger.info("Patching colorMultiplier...");
 				mn.instructions.clear();
 				mn.instructions.add(new VarInsnNode(ALOAD, 1));
 				mn.instructions.add(new VarInsnNode(ALOAD, 2));
-				mn.instructions.add(new MethodInsnNode(INVOKESTATIC, "mod/mindcraft/seasons/colorizer/LeavesGrassUtils", "getGrassColor", obf ? "(Ladq;Lcj;)I" : "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/BlockPos;)I", false));
+				mn.instructions.add(new VarInsnNode(ALOAD, 3));
+				mn.instructions.add(new MethodInsnNode(INVOKESTATIC, "mod/mindcraft/seasons/colorizer/LeavesGrassUtils", "getGrassColor", obf ? "(Larc;Lahx;Lcj;)I" : "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)I", false));
 				mn.instructions.add(new InsnNode(IRETURN));
 			}
 		}
-		logger.info(clazz + " patch complete!");
+		logger.info("Grass patch complete!");
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 		cn.accept(cw);
 		return cw.toByteArray();
@@ -147,14 +188,14 @@ public class Transformer implements IClassTransformer {
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
 		for (MethodNode mn : cn.methods) {
-			if ((mn.name.equals("canSnowAtBody")) && (mn.desc.equals("(Lcj;Z)Z") || mn.desc.equals("(Lnet/minecraft/util/BlockPos;Z)Z"))) {
+			if ((mn.name.equals("canSnowAtBody")) && (mn.desc.equals("(Lcj;Z)Z") || mn.desc.equals("(Lnet/minecraft/util/math/BlockPos;Z)Z"))) {
 				boolean obf = mn.desc.equals("(Lcj;Z)Z");
 				logger.info("Patching canSnowAtBody...");
 				InsnList insn = new InsnList();
 				insn.add(new VarInsnNode(ALOAD, 0));
 				insn.add(new VarInsnNode(ALOAD, 1));
-				insn.add(new MethodInsnNode(INVOKEVIRTUAL, obf ? "adm" : "net/minecraft/world/World", obf ? "b" : "getBiomeGenForCoords", obf ?  "(Lcj;)Lady;" : "(Lnet/minecraft/util/BlockPos;)Lnet/minecraft/world/biome/BiomeGenBase;", false));
-				insn.add(new MethodInsnNode(INVOKEVIRTUAL, obf ? "ady" : "net/minecraft/world/biome/BiomeGenBase", "isRainEnabled", "()Z", false));
+				insn.add(new MethodInsnNode(INVOKEVIRTUAL, obf ? "aht" : "net/minecraft/world/World", obf ? "b" : "getBiomeGenForCoords", obf ?  "(Lcj;)Laig;" : "(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/world/biome/BiomeGenBase;", false));
+				insn.add(new MethodInsnNode(INVOKEVIRTUAL, obf ? "aig" : "net/minecraft/world/biome/BiomeGenBase", "isRainEnabled", "()Z", false));
 				LabelNode lb = new LabelNode();
 				insn.add(new JumpInsnNode(IFNE, lb));
 				insn.add(new InsnNode(ICONST_0));
@@ -182,8 +223,8 @@ public class Transformer implements IClassTransformer {
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
 		for (MethodNode mn : cn.methods) {
-			if ((mn.name.equals("b") || mn.name.equals("updateTick")) && (mn.desc.equals("(Ladm;Lcj;Lalz;Ljava/util/Random;)V") || mn.desc.equals("(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V"))) {
-				boolean obf = mn.desc.equals("(Ladm;Lcj;Lalz;Ljava/util/Random;)V");
+			if ((mn.name.equals("b") || mn.name.equals("updateTick")) && (mn.desc.equals("(Laht;Lcj;Larc;Ljava/util/Random;)V") || mn.desc.equals("(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V"))) {
+				boolean obf = mn.desc.equals("(Laht;Lcj;Larc;Ljava/util/Random;)V");
 				logger.info("Patching updateTick...");
 				InsnList insn = new InsnList();
 				LabelNode end = new LabelNode();
@@ -191,7 +232,7 @@ public class Transformer implements IClassTransformer {
 				insn.add(new MethodInsnNode(INVOKEVIRTUAL, "mod/mindcraft/seasons/api/SeasonsAPI", "getWorldInterface", "()Lmod/mindcraft/seasons/api/interfaces/IWorldInterface;", false));
 				insn.add(new VarInsnNode(ALOAD, 2));
 				insn.add(new InsnNode(ICONST_1));
-				insn.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/interfaces/IWorldInterface", "getTemperature", obf ? "(Lcj;Z)F" : "(Lnet/minecraft/util/BlockPos;Z)F", true));
+				insn.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/interfaces/IWorldInterface", "getTemperature", obf ? "(Lcj;Z)F" : "(Lnet/minecraft/util/math/BlockPos;Z)F", true));
 				insn.add(new LdcInsnNode(new Float("5")));
 				insn.add(new InsnNode(FCMPL));
 				insn.add(new JumpInsnNode(IFLE, end));
@@ -226,8 +267,8 @@ public class Transformer implements IClassTransformer {
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
 		for (MethodNode mn : cn.methods) {
-			if ((mn.name.equals("b") || mn.name.equals("updateTick")) && (mn.desc.equals("(Ladm;Lcj;Lalz;Ljava/util/Random;)V") || mn.desc.equals("(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V"))) {
-				boolean obf = mn.desc.equals("(Ladm;Lcj;Lalz;Ljava/util/Random;)V");
+			if ((mn.name.equals("b") || mn.name.equals("updateTick")) && (mn.desc.equals("(Laht;Lcj;Larc;Ljava/util/Random;)V") || mn.desc.equals("(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V"))) {
+				boolean obf = mn.desc.equals("(Laht;Lcj;Larc;Ljava/util/Random;)V");
 				logger.info("Patching updateTick...");
 				InsnList insn = new InsnList();
 				LabelNode end = new LabelNode();
@@ -235,7 +276,7 @@ public class Transformer implements IClassTransformer {
 				insn.add(new MethodInsnNode(INVOKEVIRTUAL, "mod/mindcraft/seasons/api/SeasonsAPI", "getWorldInterface", "()Lmod/mindcraft/seasons/api/interfaces/IWorldInterface;", false));
 				insn.add(new VarInsnNode(ALOAD, 2));
 				insn.add(new InsnNode(ICONST_1));
-				insn.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/interfaces/IWorldInterface", "getTemperature", obf ? "(Lcj;Z)F" : "(Lnet/minecraft/util/BlockPos;Z)F", true));
+				insn.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/interfaces/IWorldInterface", "getTemperature", obf ? "(Lcj;Z)F" : "(Lnet/minecraft/util/math/BlockPos;Z)F", true));
 				insn.add(new LdcInsnNode(new Float("5")));
 				insn.add(new InsnNode(FCMPL));
 				insn.add(new JumpInsnNode(IFLE, end));
@@ -270,14 +311,14 @@ public class Transformer implements IClassTransformer {
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
 		for (MethodNode mn : cn.methods) {
-			if ((mn.name.equals("b") || mn.name.equals("updateTick")) && (mn.desc.equals("(Ladm;Lcj;Lalz;Ljava/util/Random;)V") || mn.desc.equals("(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V"))) {
+			if ((mn.name.equals("b") || mn.name.equals("updateTick")) && (mn.desc.equals("(Laht;Lcj;Larc;Ljava/util/Random;)V") || mn.desc.equals("(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V"))) {
 				logger.info("Patching updateTick...");
 				boolean obf = mn.name.equals("b");
 				InsnList insn = new InsnList();
 				insn.add(new VarInsnNode(ALOAD, 1));
 				insn.add(new VarInsnNode(ALOAD, 2));
 				insn.add(new VarInsnNode(ALOAD, 3));
-				insn.add(new MethodInsnNode(INVOKESTATIC, "mod/mindcraft/seasons/api/utils/EventUtils", "postCropUdate", obf ? "(Ladm;Lcj;Lalz;)Lalz;" : "(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)Lnet/minecraft/block/state/IBlockState;", false));
+				insn.add(new MethodInsnNode(INVOKESTATIC, "mod/mindcraft/seasons/api/utils/EventUtils", "postCropUdate", obf ? "(Laht;Lcj;Larc;)Larc;" : "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;)Lnet/minecraft/block/state/IBlockState;", false));
 				insn.add(new VarInsnNode(ASTORE, 3));
 				insn.add(new LabelNode());
 				Iterator<AbstractInsnNode> iter = mn.instructions.iterator();
