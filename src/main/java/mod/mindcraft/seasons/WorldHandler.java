@@ -13,14 +13,12 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -110,8 +108,7 @@ public class WorldHandler {
 					PotionEffect burnt = player.getActivePotionEffect(Seasons.BURNT);
 					if (hypothermia != null && hypothermia.getIsAmbient())
 						player.removePotionEffect(Seasons.HYPOTHERMIA.id);
-					boolean isRainEnabled = ReflectionHelper.<Boolean, BiomeGenBase>getPrivateValue(BiomeGenBase.class, world.getBiomeGenForCoords(pos), "enableRain", "ay");
-					if (burnt != null && (player.isInWater() || (world.canBlockSeeSky(pos) && world.isRaining() && isRainEnabled)))
+					if (burnt != null && player.isWet())
 						player.removePotionEffect(Seasons.BURNT.id);
 				}
 			}
