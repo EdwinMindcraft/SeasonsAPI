@@ -22,6 +22,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -108,6 +109,13 @@ public class WorldHandler {
 	@SubscribeEvent
 	public void worldLoad(WorldEvent.Load e) {
 		((WorldInterface)SeasonsAPI.instance.getWorldInterface()).setWorld(e.world);
+	}
+	
+	@SubscribeEvent
+	public void worldTick(TickEvent.WorldTickEvent e) {
+		if (e.world.getWorldInfo().isRaining()) {
+			e.world.setRainStrength(SeasonsAPI.instance.cfg.getRainFall(SeasonsAPI.instance.getWorldInterface().getSeason()));
+		}
 	}
 	
 	@SubscribeEvent

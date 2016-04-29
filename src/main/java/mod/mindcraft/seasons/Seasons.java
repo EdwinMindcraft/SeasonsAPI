@@ -23,8 +23,8 @@ public class Seasons {
 	@Instance("seasonsapi")
 	public static Seasons instance;
 	
-	public static final Potion HYPOTHERMIA = new SeasonPotion(new ResourceLocation("seasonsapi", "hyporthermia"), true, 0x00ffff).setPotionName("hypothermia");
-	public static final Potion BURNT = new SeasonPotion(new ResourceLocation("seasonsapi", "burnt"), true, 0x990000).setPotionName("burnt");
+	public static final Potion HYPOTHERMIA = new SeasonPotion(new ResourceLocation("seasonsapi", "hyporthermia"), true, 0x00ffff).setPotionName("seasons:hypothermia");
+	public static final Potion BURNT = new SeasonPotion(new ResourceLocation("seasonsapi", "burnt"), true, 0x990000).setPotionName("seasons:burnt");
 	
 	public static SimpleNetworkWrapper network;
 	

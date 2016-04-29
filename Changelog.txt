@@ -2,6 +2,7 @@
 -Configurable Crops Growth multiplier per seasons (Seasons category) - request by MechWarrior99
 -Added a seasons command - request by MechWarrior99
 -Added a config option (on by default) to display year and season at any time - request by MechWarrior99
+-Configurable Rainfall per season - request by MechWarrior99
 -Fixed a crash when you left while rendering leaves
 
 1.0.2

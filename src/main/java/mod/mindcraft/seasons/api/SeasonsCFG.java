@@ -2,6 +2,7 @@ package mod.mindcraft.seasons.api;
 
 import java.io.File;
 
+import mod.mindcraft.seasons.api.enums.EnumSeason;
 import net.minecraftforge.common.config.Configuration;
 
 public class SeasonsCFG extends Configuration {
@@ -19,6 +20,10 @@ public class SeasonsCFG extends Configuration {
 	public float autumnGrowthMultiplier;
 	public float winterGrowthMultiplier;
 	public boolean seasonAlwaysVisible;
+	public float summerRainfall;
+	public float springRainfall;
+	public float autumnRainfall;
+	public float winterRainfall;
 	
 	public SeasonsCFG(File file) {
 		super(file);
@@ -31,11 +36,15 @@ public class SeasonsCFG extends Configuration {
 		burntStart = getInt("Burnt Start", "temperature", 80, -1000, 1000, "At which temperature does burnt starts - Hardcore Mode");
 		burntDiff = getInt("Burnt Level Difference", "temperature", 100, 1, 1000, "Temperature between burnt levels - Hardcore Mode");
 		enableTempDebug = getBoolean("Enable Debug", "advanced", true, "Enable the temperature display in the debug screen");
-		summerGrowthMultiplier = getFloat("Summer Growth Multiplier", "seasons", 0F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
-		springGrowthMultiplier = getFloat("Spring Growth Multiplier", "seasons", 0.75F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
-		autumnGrowthMultiplier = getFloat("Autumn Growth Multiplier", "seasons", -0.1F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
-		winterGrowthMultiplier = getFloat("Winter Growth Multiplier", "seasons", -0.5F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+		summerGrowthMultiplier = getFloat("Summer Growth Multiplier", "summer", 0F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+		springGrowthMultiplier = getFloat("Spring Growth Multiplier", "spring", 0.75F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+		autumnGrowthMultiplier = getFloat("Autumn Growth Multiplier", "autumn", -0.1F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+		winterGrowthMultiplier = getFloat("Winter Growth Multiplier", "winter", -0.5F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
 		seasonAlwaysVisible = getBoolean("Season Always visible", "advanced", true, "Enable the temperature display on screen");
+		summerRainfall = getFloat("Summer Rainfall", "summer", 0.25F, 0F, 10F, "Rainfall in summer");
+		springRainfall = getFloat("Spring Rainfall", "spring", 2F, 0F, 10F, "Rainfall in spring");
+		autumnRainfall = getFloat("Autumn Rainfall", "autumn", 3F, 0F, 10F, "Rainfall in autumn");
+		winterRainfall = getFloat("Winter Rainfall", "winter", 1F, 0F, 10F, "Rainfall in winter");
 		save();
 	}
 	
@@ -54,6 +63,21 @@ public class SeasonsCFG extends Configuration {
 		autumnGrowthMultiplier = getFloat("Autumn Growth Multiplier", "seasons", -0.1F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
 		winterGrowthMultiplier = getFloat("Winter Growth Multiplier", "seasons", -0.5F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
 		seasonAlwaysVisible = getBoolean("Season Always visible", "advanced", true, "Enable the temperature display on screen");
+		summerRainfall = getFloat("Summer Rainfall", "summer", 0.25F, 0F, 10F, "Rainfall in summer");
+		springRainfall = getFloat("Spring Rainfall", "spring", 2F, 0F, 10F, "Rainfall in spring");
+		autumnRainfall = getFloat("Autumn Rainfall", "autumn", 3F, 0F, 10F, "Rainfall in autumn");
+		winterRainfall = getFloat("Winter Rainfall", "winter", 1F, 0F, 10F, "Rainfall in winter");
 		save();
+	}
+	
+	public float getRainFall(EnumSeason season) {
+		switch (season) {
+		case SPRING: return springRainfall;
+		case SUMMER: return summerRainfall;
+		case AUTUMN: return autumnRainfall;
+		case WINTER: return winterRainfall;
+		default:
+			return 0;
+		}
 	}
 }
