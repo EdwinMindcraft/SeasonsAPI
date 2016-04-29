@@ -2,9 +2,9 @@ package mod.mindcraft.seasons.api.enums;
 
 public enum EnumSeason {
 	SPRING(1.0F, 0),
-	SUMMER(1.5F, 10),
-	AUTUMN(1.0F, -5),
-	WINTER(0.5F, -10);
+	SUMMER(1.5F, 20),
+	AUTUMN(1.0F, -10),
+	WINTER(0.5F, -20);
 	
 	public final float temperatureMultiplier;
 	public final int temperatureDif;

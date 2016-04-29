@@ -13,10 +13,8 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.IincInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
@@ -50,6 +48,15 @@ public class Transformer implements IClassTransformer {
 		}
 		else if (transformedName.equals("net.minecraft.block.BlockSnow")) {
 			return transformBlockSnow(basicClass);
+		}
+		else if (transformedName.equals("net.minecraft.block.BlockGrass")) {
+			return transformBlockGrass(basicClass, "BlockGrass");
+		}
+		else if (transformedName.equals("net.minecraft.block.BlockTallGrass")) {
+			return transformBlockGrass(basicClass, "BlockTallGrass");
+		}
+		else if (transformedName.equals("net.minecraft.block.BlockDoublePlant")) {
+			return transformBlockGrass(basicClass, "BlockDoublePlant");
 		}
 		return basicClass;
 	}
@@ -102,11 +109,33 @@ public class Transformer implements IClassTransformer {
 				mn.instructions.clear();
 				mn.instructions.add(new VarInsnNode(ALOAD, 1));
 				mn.instructions.add(new VarInsnNode(ALOAD, 2));
-				mn.instructions.add(new MethodInsnNode(INVOKESTATIC, "mod/mindcraft/seasons/colorizer/LeavesUtils", "getLeavesColor", obf ? "(Ladq;Lcj;)I" : "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/BlockPos;)I", false));
+				mn.instructions.add(new MethodInsnNode(INVOKESTATIC, "mod/mindcraft/seasons/colorizer/LeavesGrassUtils", "getLeavesColor", obf ? "(Ladq;Lcj;)I" : "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/BlockPos;)I", false));
 				mn.instructions.add(new InsnNode(IRETURN));
 			}
 		}
 		logger.info("BlockLeaves patch complete!");
+		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+		cn.accept(cw);
+		return cw.toByteArray();
+	}
+	
+	private byte[] transformBlockGrass(byte[] basicClass, String clazz) {
+		logger.info("Starting " + clazz + " Patch...");
+		ClassReader cr = new ClassReader(basicClass);
+		ClassNode cn = new ClassNode();
+		cr.accept(cn, 0);
+		for (MethodNode mn : cn.methods) {
+			if ((mn.name.equals("a") || mn.name.equals("colorMultiplier")) && (mn.desc.equals("(Ladq;Lcj;I)I") || mn.desc.equals("(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/BlockPos;I)I"))) {
+				boolean obf = mn.name.equals("a");
+				logger.info("Patching colorMultiplier...");
+				mn.instructions.clear();
+				mn.instructions.add(new VarInsnNode(ALOAD, 1));
+				mn.instructions.add(new VarInsnNode(ALOAD, 2));
+				mn.instructions.add(new MethodInsnNode(INVOKESTATIC, "mod/mindcraft/seasons/colorizer/LeavesGrassUtils", "getGrassColor", obf ? "(Ladq;Lcj;)I" : "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/BlockPos;)I", false));
+				mn.instructions.add(new InsnNode(IRETURN));
+			}
+		}
+		logger.info(clazz + " patch complete!");
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 		cn.accept(cw);
 		return cw.toByteArray();
@@ -163,7 +192,7 @@ public class Transformer implements IClassTransformer {
 				insn.add(new VarInsnNode(ALOAD, 2));
 				insn.add(new InsnNode(ICONST_1));
 				insn.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/interfaces/IWorldInterface", "getTemperature", obf ? "(Lcj;Z)F" : "(Lnet/minecraft/util/BlockPos;Z)F", true));
-				insn.add(new InsnNode(FCONST_0));
+				insn.add(new LdcInsnNode(new Float("5")));
 				insn.add(new InsnNode(FCMPL));
 				insn.add(new JumpInsnNode(IFLE, end));
 				
@@ -207,7 +236,7 @@ public class Transformer implements IClassTransformer {
 				insn.add(new VarInsnNode(ALOAD, 2));
 				insn.add(new InsnNode(ICONST_1));
 				insn.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/interfaces/IWorldInterface", "getTemperature", obf ? "(Lcj;Z)F" : "(Lnet/minecraft/util/BlockPos;Z)F", true));
-				insn.add(new InsnNode(FCONST_0));
+				insn.add(new LdcInsnNode(new Float("5")));
 				insn.add(new InsnNode(FCMPL));
 				insn.add(new JumpInsnNode(IFLE, end));
 				

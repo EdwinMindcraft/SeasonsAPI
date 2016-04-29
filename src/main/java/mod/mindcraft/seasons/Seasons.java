@@ -14,7 +14,6 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 @Mod(modid="seasonsapi", version="1.0.3", acceptedMinecraftVersions="1.8.9", modLanguage="java", guiFactory="mod.mindcraft.seasons.ConfigFactory", canBeDeactivated=false)
 public class Seasons {
@@ -25,9 +24,7 @@ public class Seasons {
 	
 	public static final Potion HYPOTHERMIA = new SeasonPotion(new ResourceLocation("seasonsapi", "hyporthermia"), true, 0x00ffff).setPotionName("seasons:hypothermia");
 	public static final Potion BURNT = new SeasonPotion(new ResourceLocation("seasonsapi", "burnt"), true, 0x990000).setPotionName("seasons:burnt");
-	
-	public static SimpleNetworkWrapper network;
-	
+		
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent e) {
 		SeasonsAPI.instance.setCfg(new SeasonsCFG(e.getSuggestedConfigurationFile()));

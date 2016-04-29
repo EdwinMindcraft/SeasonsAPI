@@ -11,7 +11,7 @@ public class FoliageSeasonColorizer implements
 
 	@Override
 	public int getSpringColor() {
-		return 0x009900;
+		return 0x55ff00;
 	}
 
 	@Override
@@ -23,7 +23,7 @@ public class FoliageSeasonColorizer implements
 
 	@Override
 	public int getSummerColor() {
-		return 0x55ff00;
+		return 0xffff00;
 	}
 
 	@Override

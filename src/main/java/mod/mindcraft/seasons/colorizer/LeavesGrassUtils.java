@@ -13,7 +13,7 @@ import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.biome.BiomeColorHelper;
 
-public class LeavesUtils {
+public class LeavesGrassUtils {
 	
 	private static WorldInterface worldInterface = ((WorldInterface)SeasonsAPI.instance.getWorldInterface());
 	
@@ -31,7 +31,7 @@ public class LeavesUtils {
 
                 if (blockplanks$enumtype == BlockPlanks.EnumType.BIRCH)
                 {
-                    return ColorizerUtils.mix(ColorizerFoliage.getFoliageColorBirch(), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getWorldTime()), 0.5F);
+                    return ColorizerUtils.mix(ColorizerFoliage.getFoliageColorBirch(), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getWorldTime()), 0.25F);
                 }
                 if (blockplanks$enumtype == BlockPlanks.EnumType.JUNGLE)
                 {
@@ -39,10 +39,18 @@ public class LeavesUtils {
                 }
             }
 
-            return ColorizerUtils.mix(BiomeColorHelper.getFoliageColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getWorldTime()), 0.5F);        	
+            return ColorizerUtils.mix(BiomeColorHelper.getFoliageColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getWorldTime()), 0.25F);        	
         } catch (NullPointerException e) {
         	return BiomeColorHelper.getFoliageColorAtPos(world, pos);
         }
-        
+ 	}
+	
+	public static int getGrassColor(IBlockAccess world, BlockPos pos) {
+        IBlockState iblockstate = world.getBlockState(pos);
+        try {
+            return ColorizerUtils.mix(BiomeColorHelper.getGrassColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new GrassSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getWorldTime()), 0.75F);        	
+        } catch (NullPointerException e) {
+        	return BiomeColorHelper.getGrassColorAtPos(world, pos);
+        }
  	}
 }

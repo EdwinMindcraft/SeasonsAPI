@@ -4,7 +4,10 @@ import java.util.HashMap;
 
 import mod.mindcraft.seasons.api.SeasonsAPI;
 import mod.mindcraft.seasons.api.enums.EnumSeason;
+import mod.mindcraft.seasons.api.interfaces.ITemperatureModifier;
 import mod.mindcraft.seasons.api.interfaces.IWorldInterface;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
@@ -37,8 +40,6 @@ public class WorldInterface implements IWorldInterface {
 		long seasonLenght = 24000 * SeasonsAPI.instance.getCfg().seasonLenght;
 		long yearTime = time % (seasonLenght * 4);
 		int seasonOrdinal = (int) Math.floor(yearTime / seasonLenght);
-		if (seasonOrdinal > 3)
-			throw new ArrayIndexOutOfBoundsException(seasonOrdinal);
 		return EnumSeason.values()[seasonOrdinal];
 	}
 	
@@ -58,16 +59,18 @@ public class WorldInterface implements IWorldInterface {
 				if (!getWorld().getChunkProvider().chunkExists((int)Math.floor((float)pos.getX() / 16F), (int)Math.floor((float)pos.getZ() / 16F)))
 					return 0;
 				float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).calcBlockExternalTemp(worldObj, newPos);
-				temp += (getWorld().getBiomeGenForCoords(pos).temperature * 12.5F * timeMultiplier);
 				temp += getSeason().temperatureDif;
+				temp += (getWorld().getBiomeGenForCoords(pos).temperature * 12.5F * timeMultiplier);
+				if (!getWorld().canBlockSeeSky(pos)) temp /= 1.5;
 				return temp > 0 ? temp * getSeason().temperatureMultiplier : temp * getSeason().getOpposite().temperatureMultiplier;
 			} catch (NullPointerException e) {
 				ChunkTemperature temp = new ChunkTemperature();
 				temp.calcChunkTemp(getWorld(), getWorld().getChunkFromBlockCoords(newPos).xPosition * 16, getWorld().getChunkFromBlockCoords(newPos).zPosition * 16);
 				WorldHandler.tempMap.put(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair(), temp);
 				float temp2 = temp.getTempForBlock(newPos);
-				temp2 += (getWorld().getBiomeGenForCoords(pos).temperature * 12.5F * timeMultiplier);
 				temp2 += getSeason().temperatureDif;
+				temp2 += (getWorld().getBiomeGenForCoords(pos).temperature * 12.5F * timeMultiplier);
+				if (!getWorld().canBlockSeeSky(pos)) temp2 /= 1.5;
 				return temp2 > 0 ? temp2 * getSeason().temperatureMultiplier : temp2 * getSeason().getOpposite().temperatureMultiplier;
 			}			
 		} else {
@@ -75,16 +78,18 @@ public class WorldInterface implements IWorldInterface {
 				if (!getWorld().getChunkProvider().chunkExists((int)Math.floor((float)pos.getX() / 16F), (int)Math.floor((float)pos.getZ() / 16F)))
 					return 0;
 				float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).getTempForBlock(newPos);
-				temp += (getWorld().getBiomeGenForCoords(pos).temperature * 12.5F * timeMultiplier);
 				temp += getSeason().temperatureDif;
+				temp += (getWorld().getBiomeGenForCoords(pos).temperature * 12.5F * timeMultiplier);
+				if (!getWorld().canBlockSeeSky(pos)) temp /= 1.5;
 				return temp > 0 ? temp * getSeason().temperatureMultiplier : temp * getSeason().getOpposite().temperatureMultiplier;
 			} catch (NullPointerException e) {
 				ChunkTemperature temp = new ChunkTemperature();
 				temp.calcChunkTemp(getWorld(), getWorld().getChunkFromBlockCoords(newPos).xPosition * 16, getWorld().getChunkFromBlockCoords(newPos).zPosition * 16);
 				WorldHandler.tempMap.put(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair(), temp);
 				float temp2 = temp.getTempForBlock(newPos);
-				temp2 += (getWorld().getBiomeGenForCoords(pos).temperature * 12.5F * timeMultiplier);
 				temp2 += getSeason().temperatureDif;
+				temp2 += (getWorld().getBiomeGenForCoords(pos).temperature * 12.5F * timeMultiplier);
+				if (!getWorld().canBlockSeeSky(pos)) temp2 /= 1.5;
 				return temp2 > 0 ? temp2 * getSeason().temperatureMultiplier : temp2 * getSeason().getOpposite().temperatureMultiplier;
 			}
 		}
@@ -119,6 +124,18 @@ public class WorldInterface implements IWorldInterface {
 	@Override
 	public float getTemperatureFromTime(BlockPos pos) {
 		return getTemperatureFromTime(pos, worldObj.getWorldTime());
+	}
+	
+	@Override
+	public float getInternalTemperature(EntityPlayer entity) {
+		float temp = getTemperature(new BlockPos(entity.posX, entity.posY, entity.posZ));
+		for (int i = 0; i < entity.inventory.armorInventory.length; i++) {
+			ItemStack armor = entity.inventory.armorInventory[i];
+			if (armor != null && armor.getItem() instanceof ITemperatureModifier) {
+				temp = ((ITemperatureModifier)armor.getItem()).getTemperature(armor, temp);
+			}
+		}
+		return temp;
 	}
 
 	public World getWorld() {

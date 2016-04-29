@@ -81,7 +81,8 @@ public class WorldHandler {
 					}					
 				}
 				i = MathHelper.clamp_int(i + bonusStage, 0, 7);
-				e.world.setBlockState(e.pos, e.state.withProperty(BlockCrops.AGE, i));
+				e.state = e.state.withProperty(BlockCrops.AGE, i);
+				e.world.setBlockState(e.pos, e.state);
 			}
 		}
 	}
@@ -89,8 +90,11 @@ public class WorldHandler {
 	@SubscribeEvent
 	public void debugInfo(RenderGameOverlayEvent.Text e) {
 		if (SeasonsAPI.instance.getCfg().enableTempDebug && Minecraft.getMinecraft().gameSettings.showDebugInfo) {
-			float temp = (float) (Math.floor(SeasonsAPI.instance.getWorldInterface().getTemperature(Minecraft.getMinecraft().thePlayer.getPosition()) * 100) / 100);
-			e.left.add("\u00a7c[SAPI]\u00a7r" + (temp < SeasonsAPI.instance.cfg.hypothermiaStart ? "\u00a7b" : (temp > SeasonsAPI.instance.cfg.burntStart ? "\u00a74" : "")) + "Temperature : " + temp + " C");
+			EntityPlayer p = Minecraft.getMinecraft().thePlayer;
+			float temp = (float) (Math.floor(SeasonsAPI.instance.getWorldInterface().getTemperature(new BlockPos(p.posX, p.posY, p.posZ)) * 100) / 100);
+			e.left.add("\u00a7c[SAPI]\u00a7r" + (temp < SeasonsAPI.instance.cfg.hypothermiaStart ? "\u00a7b" : (temp > SeasonsAPI.instance.cfg.burntStart ? "\u00a74" : "")) + "External Temperature : " + temp + " C");
+			temp =(float) (Math.floor(SeasonsAPI.instance.getWorldInterface().getInternalTemperature(p) * 100) / 100);
+			e.left.add("\u00a7c[SAPI]\u00a7r" + (temp < SeasonsAPI.instance.cfg.hypothermiaStart ? "\u00a7b" : (temp > SeasonsAPI.instance.cfg.burntStart ? "\u00a74" : "")) + "Internal Temperature : " + temp + " C");
 			e.left.add("\u00a7c[SAPI]\u00a7rChunks in temperature map : " + tempMap.size());
 			if (!SeasonsAPI.instance.getCfg().seasonAlwaysVisible) {
 				long seasonLenght = 24000 * SeasonsAPI.instance.getCfg().seasonLenght;
@@ -130,7 +134,7 @@ public class WorldHandler {
 	
 	@SubscribeEvent
 	public void livingTick (LivingUpdateEvent e) {
-		BlockPos pos = e.entityLiving.getPosition();
+		BlockPos pos = new BlockPos(e.entityLiving.posX, e.entityLiving.posY, e.entityLiving.posZ);
 		SeasonsCFG cfg = SeasonsAPI.instance.getCfg();
 		World world = e.entityLiving.worldObj;
 		if (e.entityLiving.isPotionActive(Seasons.HYPOTHERMIA)) {
@@ -155,7 +159,7 @@ public class WorldHandler {
 				try {
 					tempMap.get(world.getChunkFromBlockCoords(pos).getChunkCoordIntPair()).calcBlockTemp(world, pos);
 				} catch (Exception ex) {}
-				float temp = SeasonsAPI.instance.getWorldInterface().getTemperature(pos);
+				float temp = SeasonsAPI.instance.getWorldInterface().getInternalTemperature(player);
 				if (temp < cfg.hypothermiaStart) {
 					int hypothermiaLevel = (int) Math.floor(Math.abs(temp - cfg.hypothermiaStart) / (float)cfg.hypothermiaLevelDiff);
 					player.removePotionEffect(Seasons.HYPOTHERMIA.id);

@@ -10,7 +10,7 @@ commands.seasons.spring=Set season to Spring of year %d
 commands.seasons.summer=Set season to Summer of year %d
 commands.seasons.autumn=Set season to Autumn of year %d
 commands.seasons.winter=Set season to Winter of year %d
-commands.seasons.usage=Usage : /seasons <spring|summer|autumn|winter> <year>
+commands.seasons.usage=/seasons <spring|summer|autumn|winter> <year>
 
 seasons:hypothermia=Hypothermia
 seasons:burnt=Burnt

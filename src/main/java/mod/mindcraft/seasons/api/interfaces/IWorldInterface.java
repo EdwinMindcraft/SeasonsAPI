@@ -1,6 +1,7 @@
 package mod.mindcraft.seasons.api.interfaces;
 
 import mod.mindcraft.seasons.api.enums.EnumSeason;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.biome.BiomeGenBase;
 
@@ -79,5 +80,7 @@ public interface IWorldInterface {
 	 *  
 	 */
 	public float getTemperatureFromTime(BlockPos pos);
+
+	public float getInternalTemperature(EntityPlayer entity);
 
 }

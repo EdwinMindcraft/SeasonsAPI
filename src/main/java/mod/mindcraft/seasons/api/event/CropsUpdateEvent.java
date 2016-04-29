@@ -7,9 +7,11 @@ import net.minecraftforge.event.world.BlockEvent;
 
 public class CropsUpdateEvent extends BlockEvent {
 	
+	public IBlockState state;
+	
 	public CropsUpdateEvent(World world, BlockPos pos, IBlockState state) {
 		super(world, pos, state);
-		
+		this.state = state;
 	}
 
 }
