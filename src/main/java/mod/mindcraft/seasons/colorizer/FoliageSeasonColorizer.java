@@ -1,6 +1,6 @@
 package mod.mindcraft.seasons.colorizer;
 
-import mod.mindcraft.seasons.api.ISeasonColorizer;
+import mod.mindcraft.seasons.api.interfaces.ISeasonColorizer;
 import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
@@ -23,7 +23,7 @@ public class FoliageSeasonColorizer implements
 
 	@Override
 	public int getSummerColor() {
-		return 0xbbff00;
+		return 0x55ff00;
 	}
 
 	@Override

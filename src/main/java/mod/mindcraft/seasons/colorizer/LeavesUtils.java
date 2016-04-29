@@ -1,9 +1,9 @@
 package mod.mindcraft.seasons.colorizer;
 
 import mod.mindcraft.seasons.WorldInterface;
-import mod.mindcraft.seasons.api.ColorizerUtils;
-import mod.mindcraft.seasons.api.ISeasonColorizer;
 import mod.mindcraft.seasons.api.SeasonsAPI;
+import mod.mindcraft.seasons.api.interfaces.ISeasonColorizer;
+import mod.mindcraft.seasons.api.utils.ColorizerUtils;
 import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
@@ -31,14 +31,14 @@ public class LeavesUtils {
 
             if (blockplanks$enumtype == BlockPlanks.EnumType.BIRCH)
             {
-                return ColorizerUtils.mix(ColorizerFoliage.getFoliageColorBirch(), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getTotalWorldTime()), 0.5F);
+                return ColorizerUtils.mix(ColorizerFoliage.getFoliageColorBirch(), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getWorldTime()), 0.5F);
             }
             if (blockplanks$enumtype == BlockPlanks.EnumType.JUNGLE)
             {
-                return ColorizerUtils.mix(BiomeColorHelper.getFoliageColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getTotalWorldTime()), 0.75F);
+                return ColorizerUtils.mix(BiomeColorHelper.getFoliageColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getWorldTime()), 0.75F);
             }
         }
 
-        return ColorizerUtils.mix(BiomeColorHelper.getFoliageColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getTotalWorldTime()), 0.5F);
+        return ColorizerUtils.mix(BiomeColorHelper.getFoliageColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getWorldTime()), 0.5F);
 	}
 }

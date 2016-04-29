@@ -1,4 +1,4 @@
-package mod.mindcraft.seasons.api;
+package mod.mindcraft.seasons.api.utils;
 
 import java.awt.Color;
 

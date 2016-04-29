@@ -1,6 +1,8 @@
-package mod.mindcraft.seasons.api;
+package mod.mindcraft.seasons.api.interfaces;
 
+import mod.mindcraft.seasons.api.SeasonsAPI;
 import mod.mindcraft.seasons.api.enums.EnumSeason;
+import mod.mindcraft.seasons.api.utils.ColorizerUtils;
 import net.minecraft.block.state.IBlockState;
 
 public interface ISeasonColorizer {
@@ -30,15 +32,17 @@ public interface ISeasonColorizer {
 			try {
 				EnumSeason season = SeasonsAPI.instance.getWorldInterface().getSeason();
 				EnumSeason other;
+				boolean prev = false;
 				if (time % (seasonMiddle*2) > seasonMiddle) {
 					other = season.next();
 				} else {
 					other = season.prev();
+					prev = true;
 				}
 				float current = (((float)time + (float)seasonMiddle) % ((float)seasonMiddle * 2)) / ((float)seasonMiddle * 2);
 				//System.out.println(current);
-				int cColor = getColor(season, state);
-				int oColor = getColor(other, state);
+				int cColor = getColor(prev ? season : other, state);
+				int oColor = getColor(prev ? other : season, state);
 //				System.out.println("Percentage : " + current + ", Color : " + new Color(ColorizerUtils.mix(cColor, oColor, current)));
 //				System.out.println("Main Color : " + new Color(cColor).toString());
 //				System.out.println("Secondary Color : " + new Color(oColor).toString());

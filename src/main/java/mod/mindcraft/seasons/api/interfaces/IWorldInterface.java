@@ -1,4 +1,4 @@
-package mod.mindcraft.seasons.api;
+package mod.mindcraft.seasons.api.interfaces;
 
 import mod.mindcraft.seasons.api.enums.EnumSeason;
 import net.minecraft.util.BlockPos;

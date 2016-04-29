@@ -1,5 +1,13 @@
+1.0.2
+-Hypothermia and Burnt effect now properly track temperature
+-Removed TotalWorldTimeSet
+-More debug informations featuring loaded chunk number and current season
+-Fixed leaves colours
+-Probably more fixes that I forgot...
+
 1.0.1
 -Fixed Temperature in biomes
+-Fixed snow only forming in no-rain biome (That was dumb)
 -Ice and snow layer now melt if the biome is too hot
 -Crops have a chance to grow twice in spring
 -Crops grow way slower during winter

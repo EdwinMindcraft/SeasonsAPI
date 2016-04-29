@@ -2,9 +2,9 @@ package mod.mindcraft.seasons;
 
 import java.util.HashMap;
 
-import mod.mindcraft.seasons.api.IWorldInterface;
 import mod.mindcraft.seasons.api.SeasonsAPI;
 import mod.mindcraft.seasons.api.enums.EnumSeason;
+import mod.mindcraft.seasons.api.interfaces.IWorldInterface;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
@@ -29,7 +29,7 @@ public class WorldInterface implements IWorldInterface {
 	
 	@Override
 	public EnumSeason getSeason() {
-		return getSeason(getWorld().getTotalWorldTime());
+		return getSeason(worldObj.getWorldTime());
 	}
 	
 	@Override
@@ -113,16 +113,15 @@ public class WorldInterface implements IWorldInterface {
 
 	@Override
 	public float getTemperatureFromTime(BiomeGenBase biome) {
-		return getTemperatureFromTime(biome, getWorld().getTotalWorldTime());
+		return getTemperatureFromTime(biome, worldObj.getWorldTime());
 	}
 
 	@Override
 	public float getTemperatureFromTime(BlockPos pos) {
-		return getTemperatureFromTime(pos, getWorld().getTotalWorldTime());
+		return getTemperatureFromTime(pos, worldObj.getWorldTime());
 	}
 
 	public World getWorld() {
 		return worldObj;
 	}
-
 }

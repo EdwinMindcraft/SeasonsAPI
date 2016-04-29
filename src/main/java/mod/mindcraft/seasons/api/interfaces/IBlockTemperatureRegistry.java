@@ -1,4 +1,4 @@
-package mod.mindcraft.seasons.api;
+package mod.mindcraft.seasons.api.interfaces;
 
 import net.minecraft.block.state.IBlockState;
 

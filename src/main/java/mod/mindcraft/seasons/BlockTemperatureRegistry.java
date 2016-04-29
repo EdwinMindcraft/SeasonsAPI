@@ -2,7 +2,7 @@ package mod.mindcraft.seasons;
 
 import java.util.HashMap;
 
-import mod.mindcraft.seasons.api.IBlockTemperatureRegistry;
+import mod.mindcraft.seasons.api.interfaces.IBlockTemperatureRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 

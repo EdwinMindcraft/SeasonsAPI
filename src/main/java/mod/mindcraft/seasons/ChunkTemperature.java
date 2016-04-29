@@ -1,9 +1,8 @@
 package mod.mindcraft.seasons;
 
-import mod.mindcraft.seasons.api.IBlockTemperatureRegistry;
-import mod.mindcraft.seasons.api.IWorldInterface;
 import mod.mindcraft.seasons.api.SeasonsAPI;
-import net.minecraft.init.Blocks;
+import mod.mindcraft.seasons.api.interfaces.IBlockTemperatureRegistry;
+import mod.mindcraft.seasons.api.interfaces.IWorldInterface;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.BlockPos;
