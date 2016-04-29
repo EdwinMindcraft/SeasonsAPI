@@ -5,12 +5,15 @@ import java.util.Random;
 
 import mod.mindcraft.seasons.api.SeasonsAPI;
 import mod.mindcraft.seasons.api.SeasonsCFG;
+import mod.mindcraft.seasons.api.event.CropsUpdateEvent;
 import mod.mindcraft.seasons.api.interfaces.ITemperatureUpdater;
 import mod.mindcraft.seasons.api.utils.DamageSources;
+import net.minecraft.block.BlockCrops;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -40,13 +43,66 @@ public class WorldHandler {
 	}
 	
 	@SubscribeEvent
+	public void onCropsUpdate(CropsUpdateEvent e) {
+		if (e.world.getLightFromNeighbors(e.pos.up()) >= 9) {
+			int i = ((Integer)e.state.getValue(BlockCrops.AGE)).intValue();
+			if (i < 7) {
+				Random rand = new Random();
+				float multiplier = 0;
+				switch (SeasonsAPI.instance.getWorldInterface().getSeason()) {
+				case SPRING:
+					multiplier = SeasonsAPI.instance.getCfg().springGrowthMultiplier;
+					break;
+				case SUMMER:
+					multiplier = SeasonsAPI.instance.getCfg().summerGrowthMultiplier;					
+					break;
+				case AUTUMN:
+					multiplier = SeasonsAPI.instance.getCfg().autumnGrowthMultiplier;					
+					break;
+				case WINTER:
+					multiplier = SeasonsAPI.instance.getCfg().winterGrowthMultiplier;					
+					break;					
+				default:
+					break;
+				}
+				
+				int bonusStage = 0;
+				if (multiplier > 0) {
+					for (;multiplier > 0; multiplier--) {
+						if (rand.nextFloat() <= multiplier)
+							bonusStage++;
+					}
+				}
+				else {
+					for (;multiplier < 0; multiplier++) {
+						if (rand.nextFloat() <= Math.abs(multiplier))
+							bonusStage--;
+					}					
+				}
+				i = MathHelper.clamp_int(i + bonusStage, 0, 7);
+				e.state.withProperty(BlockCrops.AGE, i);
+				e.world.setBlockState(e.pos, e.state);
+			}
+		}
+	}
+	
+	@SubscribeEvent
 	public void debugInfo(RenderGameOverlayEvent.Text e) {
 		if (SeasonsAPI.instance.getCfg().enableTempDebug && Minecraft.getMinecraft().gameSettings.showDebugInfo) {
 			float temp = (float) (Math.floor(SeasonsAPI.instance.getWorldInterface().getTemperature(Minecraft.getMinecraft().thePlayer.getPosition()) * 100) / 100);
 			e.left.add("\u00a7c[SAPI]\u00a7r" + (temp < SeasonsAPI.instance.cfg.hypothermiaStart ? "\u00a7b" : (temp > SeasonsAPI.instance.cfg.burntStart ? "\u00a74" : "")) + "Temperature : " + temp + " C");
 			e.left.add("\u00a7c[SAPI]\u00a7rChunks in temperature map : " + tempMap.size());
+			if (!SeasonsAPI.instance.getCfg().seasonAlwaysVisible) {
+				long seasonLenght = 24000 * SeasonsAPI.instance.getCfg().seasonLenght;
+				e.left.add("\u00a7c[SAPI]\u00a7rSeason : " + StringUtils.capitalize(SeasonsAPI.instance.getWorldInterface().getSeason().name().toLowerCase()) + " (" + (Math.floor((float)(Minecraft.getMinecraft().theWorld.getWorldTime() % seasonLenght) * 1000F / (float)seasonLenght) / 10F) + "%)");			
+			}
+		}
+		if (SeasonsAPI.instance.getCfg().seasonAlwaysVisible) {
 			long seasonLenght = 24000 * SeasonsAPI.instance.getCfg().seasonLenght;
-			e.left.add("\u00a7c[SAPI]\u00a7rSeason : " + StringUtils.capitalize(SeasonsAPI.instance.getWorldInterface().getSeason().name().toLowerCase()) + " (" + (Math.floor((float)(Minecraft.getMinecraft().theWorld.getWorldTime() % seasonLenght) * 1000F / (float)seasonLenght) / 10F) + "%)");
+			e.left.add("Season : " + StringUtils.capitalize(SeasonsAPI.instance.getWorldInterface().getSeason().name().toLowerCase()) + " (" + (Math.floor((float)(Minecraft.getMinecraft().theWorld.getWorldTime() % seasonLenght) * 1000F / (float)seasonLenght) / 10F) + "%)");
+			long year = (long) Math.floor((float)(((WorldInterface)SeasonsAPI.instance.getWorldInterface()).getWorld().getWorldTime() / ((float)seasonLenght * 4)));
+			long yearTime = (long) Math.floor(((float)((WorldInterface)SeasonsAPI.instance.getWorldInterface()).getWorld().getWorldTime() % ((float)seasonLenght * 4)) / 24000F);
+			e.left.add("Year " + year + " Day " + yearTime);
 		}
 	}
 	

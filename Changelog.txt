@@ -1,3 +1,6 @@
+1.0.3
+-Configurable Crops Growth multiplier per seasons (Seasons category) request by MechWarrior99
+
 1.0.2
 -Hypothermia and Burnt effect now properly track temperature
 -Removed TotalWorldTimeSet

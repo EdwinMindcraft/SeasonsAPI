@@ -14,6 +14,11 @@ public class SeasonsCFG extends Configuration {
 	public int burntStart;
 	public int burntDiff;
 	public boolean enableTempDebug;
+	public float summerGrowthMultiplier;
+	public float springGrowthMultiplier;
+	public float autumnGrowthMultiplier;
+	public float winterGrowthMultiplier;
+	public boolean seasonAlwaysVisible;
 	
 	public SeasonsCFG(File file) {
 		super(file);
@@ -26,6 +31,11 @@ public class SeasonsCFG extends Configuration {
 		burntStart = getInt("Burnt Start", "temperature", 80, -1000, 1000, "At which temperature does burnt starts - Hardcore Mode");
 		burntDiff = getInt("Burnt Level Difference", "temperature", 100, 1, 1000, "Temperature between burnt levels - Hardcore Mode");
 		enableTempDebug = getBoolean("Enable Debug", "advanced", true, "Enable the temperature display in the debug screen");
+		summerGrowthMultiplier = getFloat("Summer Growth Multiplier", "seasons", 0F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+		springGrowthMultiplier = getFloat("Spring Growth Multiplier", "seasons", 0.75F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+		autumnGrowthMultiplier = getFloat("Autumn Growth Multiplier", "seasons", -0.1F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+		winterGrowthMultiplier = getFloat("Winter Growth Multiplier", "seasons", -0.5F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+		seasonAlwaysVisible = getBoolean("Season Always visible", "advanced", true, "Enable the temperature display on screen");
 		save();
 	}
 	
@@ -39,6 +49,11 @@ public class SeasonsCFG extends Configuration {
 		burntStart = getInt("Burnt Start", "temperature", 80, -1000, 1000, "At which temperature does burnt starts - Hardcore Mode");
 		burntDiff = getInt("Burnt Level Difference", "temperature", 100, 1, 1000, "Temperature between burnt levels - Hardcore Mode");
 		enableTempDebug = getBoolean("Enable Debug", "advanced", true, "Enable the temperature display in the debug screen");
+		summerGrowthMultiplier = getFloat("Summer Growth Multiplier", "seasons", 0F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+		springGrowthMultiplier = getFloat("Spring Growth Multiplier", "seasons", 0.75F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+		autumnGrowthMultiplier = getFloat("Autumn Growth Multiplier", "seasons", -0.1F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+		winterGrowthMultiplier = getFloat("Winter Growth Multiplier", "seasons", -0.5F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+		seasonAlwaysVisible = getBoolean("Season Always visible", "advanced", true, "Enable the temperature display on screen");
 		save();
 	}
 }

@@ -243,66 +243,19 @@ public class Transformer implements IClassTransformer {
 		for (MethodNode mn : cn.methods) {
 			if ((mn.name.equals("b") || mn.name.equals("updateTick")) && (mn.desc.equals("(Ladm;Lcj;Lalz;Ljava/util/Random;)V") || mn.desc.equals("(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V"))) {
 				logger.info("Patching updateTick...");
+				boolean obf = mn.name.equals("b");
 				InsnList insn = new InsnList();
+				insn.add(new VarInsnNode(ALOAD, 1));
+				insn.add(new VarInsnNode(ALOAD, 2));
+				insn.add(new VarInsnNode(ALOAD, 3));
+				insn.add(new MethodInsnNode(INVOKESTATIC, "mod/mindcraft/seasons/api/utils/EventUtils", "postCropUdate", obf ? "(Ladm;Lcj;Lalz;)Lalz;" : "(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)Lnet/minecraft/block/state/IBlockState;", false));
+				insn.add(new VarInsnNode(ASTORE, 3));
 				insn.add(new LabelNode());
-				insn.add(new IincInsnNode(5, 1));
-				insn.add(new LabelNode());
-				//SPRING
-				insn.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/SeasonsAPI", "instance", "Lmod/mindcraft/seasons/api/SeasonsAPI;"));
-				insn.add(new MethodInsnNode(INVOKEVIRTUAL, "mod/mindcraft/seasons/api/SeasonsAPI", "getWorldInterface", "()Lmod/mindcraft/seasons/api/interfaces/IWorldInterface;", false));
-				insn.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/interfaces/IWorldInterface", "getSeason", "()Lmod/mindcraft/seasons/api/enums/EnumSeason;", true));
-				insn.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/enums/EnumSeason", "SPRING", "Lmod/mindcraft/seasons/api/enums/EnumSeason;"));
-				insn.add(new MethodInsnNode(INVOKEVIRTUAL, "mod/mindcraft/seasons/api/enums/EnumSeason", "equals", "(Ljava/lang/Object;)Z", false));
-				LabelNode node = new LabelNode();
-				insn.add(new JumpInsnNode(IFEQ, node));
-				insn.add(new VarInsnNode(ALOAD, 4));
-				insn.add(new MethodInsnNode(INVOKEVIRTUAL, "java/util/Random", "nextFloat", "()F", false));
-				insn.add(new LdcInsnNode(new Float("0.5")));
-				insn.add(new InsnNode(FCMPG));
-				insn.add(new JumpInsnNode(IFGE, node));
-				insn.add(new LabelNode());
-				insn.add(new IincInsnNode(5, 1));
-				insn.add(node);
-				//WINTER
-				insn.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/SeasonsAPI", "instance", "Lmod/mindcraft/seasons/api/SeasonsAPI;"));
-				insn.add(new MethodInsnNode(INVOKEVIRTUAL, "mod/mindcraft/seasons/api/SeasonsAPI", "getWorldInterface", "()Lmod/mindcraft/seasons/api/interfaces/IWorldInterface;", false));
-				insn.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/interfaces/IWorldInterface", "getSeason", "()Lmod/mindcraft/seasons/api/enums/EnumSeason;", true));
-				insn.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/enums/EnumSeason", "WINTER", "Lmod/mindcraft/seasons/api/enums/EnumSeason;"));
-				insn.add(new MethodInsnNode(INVOKEVIRTUAL, "mod/mindcraft/seasons/api/enums/EnumSeason", "equals", "(Ljava/lang/Object;)Z", false));
-				LabelNode node2 = new LabelNode();
-				insn.add(new JumpInsnNode(IFEQ, node2));
-				insn.add(new VarInsnNode(ALOAD, 4));
-				insn.add(new MethodInsnNode(INVOKEVIRTUAL, "java/util/Random", "nextFloat", "()F", false));
-				insn.add(new LdcInsnNode(new Float("0.25")));
-				insn.add(new InsnNode(FCMPG));
-				insn.add(new JumpInsnNode(IFGE, node2));
-				insn.add(new LabelNode());
-				insn.add(new IincInsnNode(5, -1));
-				insn.add(node2);
-				//CHECK
-				insn.add(new VarInsnNode(ILOAD, 5));
-				insn.add(new IntInsnNode(BIPUSH, 7));
-				LabelNode label = new LabelNode();
-				insn.add(new JumpInsnNode(IF_ICMPLE, label));
-				insn.add(new LabelNode());
-				insn.add(new IntInsnNode(BIPUSH, 7));
-				insn.add(new VarInsnNode(ISTORE, 5));
-				insn.add(new LabelNode());
-				insn.add(label);
 				Iterator<AbstractInsnNode> iter = mn.instructions.iterator();
 				while (iter.hasNext()) {
 					AbstractInsnNode ain = iter.next();
-					if (ain instanceof VarInsnNode && ain.getOpcode() == FSTORE) {
-						iter.next();
-						mn.instructions.insertBefore(iter.next(), insn);
-					}
-					else if (ain instanceof VarInsnNode && ain.getOpcode() == ILOAD) {
-						AbstractInsnNode next = iter.next();
-						if (next instanceof InsnNode && next.getOpcode() == ICONST_1) {
-							iter.remove();
-							iter.next();
-							iter.remove();
-						}
+					if (ain instanceof LabelNode) {
+						mn.instructions.insert(ain, insn);
 					}
 				}
 			}
