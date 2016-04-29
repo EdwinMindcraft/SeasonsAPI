@@ -36,6 +36,8 @@ public class SeasonsCFG extends Configuration {
 	public float diamondTemperature;
 	public float chainTemperature;
 	
+	public int temperatureSpreadDistance;
+	
 	public SeasonsCFG(File file) {
 		super(file);
 		reload();
@@ -75,6 +77,8 @@ public class SeasonsCFG extends Configuration {
 		goldTemperature = getArmorTemperature("Gold", -10);
 		chainTemperature = getArmorTemperature("Chain", 0);
 		diamondTemperature = getArmorTemperature("Diamond", -10);
+		
+		temperatureSpreadDistance = getInt("Temperature Spread Distance", "advanced", 5, 0, 15, "Distance over which the temperature spreads");
 		save();
 	}
 	

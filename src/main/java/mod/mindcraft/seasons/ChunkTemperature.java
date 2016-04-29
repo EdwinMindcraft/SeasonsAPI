@@ -7,7 +7,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.IChunkProvider;
 
 public class ChunkTemperature {
 	
@@ -50,13 +49,13 @@ public class ChunkTemperature {
 	
 	public float calcBlockTemp(World world, BlockPos pos) {
 		int meta = (Math.abs(pos.getX()) % 16) + (Math.abs(pos.getZ()) % 16) * 16 + (Math.abs(pos.getY()) % 256) * 256;
-		IChunkProvider provider = world.getChunkProvider();
+		int tempSpreadDist = SeasonsAPI.instance.getCfg().temperatureSpreadDistance;
 		float maxTemp = tempReg.getTemperatureForBlock(world.getBlockState(pos));
-		for (int y = -5; y < 6; y++) {
+		for (int y = -tempSpreadDist; y <= tempSpreadDist; y++) {
 			if (y + pos.getY() < 0 || y + pos.getY() > 256)
 				continue;
-			for (int x = -5; x < 6; x++) {
-				for (int z = -5; z < 6; z++) {
+			for (int x = -tempSpreadDist; x <= tempSpreadDist; x++) {
+				for (int z = -tempSpreadDist; z <= tempSpreadDist; z++) {
 					int dist = Math.abs(x) + Math.abs(y) + Math.abs(z);
 					if (dist == 0 || dist > 5)
 						continue;
@@ -66,7 +65,7 @@ public class ChunkTemperature {
 					float temp = tempReg.getTemperatureForBlock(world.getBlockState(newPos));
 					if (temp == Integer.MIN_VALUE)
 						continue;
-					temp *= (5-(float)dist) * 0.2F;
+					temp *= ((float)dist /(float)tempSpreadDist);
 					if (temp > maxTemp)
 						maxTemp = temp;
 				}
