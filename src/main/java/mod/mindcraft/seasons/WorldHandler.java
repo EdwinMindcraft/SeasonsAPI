@@ -80,8 +80,7 @@ public class WorldHandler {
 					}					
 				}
 				i = MathHelper.clamp_int(i + bonusStage, 0, 7);
-				e.state.withProperty(BlockCrops.AGE, i);
-				e.world.setBlockState(e.pos, e.state);
+				e.world.setBlockState(e.pos, e.state.withProperty(BlockCrops.AGE, i));
 			}
 		}
 	}

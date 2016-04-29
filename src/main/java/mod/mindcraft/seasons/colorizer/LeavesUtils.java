@@ -19,26 +19,30 @@ public class LeavesUtils {
 	
 	public static int getLeavesColor(IBlockAccess world, BlockPos pos) {
         IBlockState iblockstate = world.getBlockState(pos);
-
-        if (iblockstate.getBlock().equals(Blocks.leaves))
-        {
-            BlockPlanks.EnumType blockplanks$enumtype = (BlockPlanks.EnumType)iblockstate.getValue(BlockOldLeaf.VARIANT);
-
-            if (blockplanks$enumtype == BlockPlanks.EnumType.SPRUCE)
+        try {
+            if (iblockstate.getBlock().equals(Blocks.leaves))
             {
-                return ColorizerFoliage.getFoliageColorPine();
+                BlockPlanks.EnumType blockplanks$enumtype = (BlockPlanks.EnumType)iblockstate.getValue(BlockOldLeaf.VARIANT);
+
+                if (blockplanks$enumtype == BlockPlanks.EnumType.SPRUCE)
+                {
+                    return ColorizerFoliage.getFoliageColorPine();
+                }
+
+                if (blockplanks$enumtype == BlockPlanks.EnumType.BIRCH)
+                {
+                    return ColorizerUtils.mix(ColorizerFoliage.getFoliageColorBirch(), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getWorldTime()), 0.5F);
+                }
+                if (blockplanks$enumtype == BlockPlanks.EnumType.JUNGLE)
+                {
+                    return ColorizerUtils.mix(BiomeColorHelper.getFoliageColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getWorldTime()), 0.75F);
+                }
             }
 
-            if (blockplanks$enumtype == BlockPlanks.EnumType.BIRCH)
-            {
-                return ColorizerUtils.mix(ColorizerFoliage.getFoliageColorBirch(), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getWorldTime()), 0.5F);
-            }
-            if (blockplanks$enumtype == BlockPlanks.EnumType.JUNGLE)
-            {
-                return ColorizerUtils.mix(BiomeColorHelper.getFoliageColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getWorldTime()), 0.75F);
-            }
+            return ColorizerUtils.mix(BiomeColorHelper.getFoliageColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getWorldTime()), 0.5F);        	
+        } catch (NullPointerException e) {
+        	return BiomeColorHelper.getFoliageColorAtPos(world, pos);
         }
-
-        return ColorizerUtils.mix(BiomeColorHelper.getFoliageColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, worldInterface.getWorld().getWorldTime()), 0.5F);
-	}
+        
+ 	}
 }
