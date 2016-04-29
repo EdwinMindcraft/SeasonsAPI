@@ -1,3 +1,12 @@
+1.1.1
+-Config option for temperature display
+-Config option for right side season and temperature display
+-Added temperature to armors
+-Config option to make seasons command place you at the beggining of the day
+
+1.1.0
+-1.9 Update
+
 1.0.3
 -Configurable Crops Growth multiplier per seasons (Seasons category) - request by MechWarrior99
 -Added a seasons command - request by MechWarrior99

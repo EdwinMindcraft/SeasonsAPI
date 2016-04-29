@@ -33,23 +33,27 @@ public class CommandSeason extends CommandBase {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if (args.length == 2) {
+			long yearTime = (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 4 * parseInt(args[1], 0));
+			float halfSeason = (float)SeasonsAPI.instance.getCfg().seasonLenght / 2F;
+			long timeToRemove = SeasonsAPI.instance.getCfg().morningSeasonSet ? (long)((halfSeason - Math.floor(halfSeason)) * 24000) : 0;
+			System.out.println();
 			if (args[0].equalsIgnoreCase("spring")) {
-				sender.getEntityWorld().setWorldTime((long) (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 0.5 + (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 4 * parseInt(args[1], 0))));
+				sender.getEntityWorld().setWorldTime((long) (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 0.5 + yearTime - timeToRemove));
 				notifyOperators(sender, this, "commands.seasons.spring", parseInt(args[1], 0));
 				return;
 			}
 			else if (args[0].equalsIgnoreCase("summer")) {
-				sender.getEntityWorld().setWorldTime((long) (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 1.5 + (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 4 * parseInt(args[1], 0))));
+				sender.getEntityWorld().setWorldTime((long) (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 1.5 + yearTime - timeToRemove));
 				notifyOperators(sender, this, "commands.seasons.summer", parseInt(args[1], 0));
 				return;
 			}
 			else if (args[0].equalsIgnoreCase("autumn")) {
-				sender.getEntityWorld().setWorldTime((long) (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 2.5 + (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 4 * parseInt(args[1], 0))));
+				sender.getEntityWorld().setWorldTime((long) (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 2.5 + yearTime - timeToRemove));
 				notifyOperators(sender, this, "commands.seasons.autumn", parseInt(args[1], 0));
 				return;
 			}
 			else if (args[0].equalsIgnoreCase("winter")) {
-				sender.getEntityWorld().setWorldTime((long) (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 3.5 + (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 4 * parseInt(args[1], 0))));
+				sender.getEntityWorld().setWorldTime((long) (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 3.5 + yearTime - timeToRemove));
 				notifyOperators(sender, this, "commands.seasons.winter", parseInt(args[1], 0));
 				return;
 			}

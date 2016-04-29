@@ -36,6 +36,7 @@ public class ConfigFactory implements IModGuiFactory {
 			list.add(new DummyConfigElement.DummyCategoryElement("seasonstemperature", I18n.format("seasonsapi.config.temperature"), ConfigTemperature.class));
 			list.add(new DummyConfigElement.DummyCategoryElement("seasonsseasons", I18n.format("seasonsapi.config.seasons"), ConfigSeasons.class));
 			list.add(new DummyConfigElement.DummyCategoryElement("seasonsadvanced", I18n.format("seasonsapi.config.advanced"), ConfigAdvanced.class));
+			list.add(new DummyConfigElement.DummyCategoryElement("seasonsarmor", I18n.format("seasonsapi.config.armor"), ConfigArmor.class));
 			
 			return list;
 		}
@@ -52,6 +53,24 @@ public class ConfigFactory implements IModGuiFactory {
                 return new GuiConfig(this.owningScreen,
                         (new ConfigElement(SeasonsAPI.instance.cfg.getCategory("temperature"))).getChildElements(),
                         this.owningScreen.modID, "seasonstemperature", this.configElement.requiresWorldRestart() || this.owningScreen.allRequireWorldRestart,
+                        this.configElement.requiresMcRestart() || this.owningScreen.allRequireMcRestart,
+                        GuiConfig.getAbridgedConfigPath(SeasonsAPI.instance.cfg.toString()));
+            }
+			
+		}
+		
+		public static class ConfigArmor extends CategoryEntry{
+
+			public ConfigArmor(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement prop) {
+				super(owningScreen, owningEntryList, prop);
+			}
+			
+            @Override
+            protected GuiScreen buildChildScreen()
+            {
+                return new GuiConfig(this.owningScreen,
+                        (new ConfigElement(SeasonsAPI.instance.cfg.getCategory("armors"))).getChildElements(),
+                        this.owningScreen.modID, "seasonsarmor", this.configElement.requiresWorldRestart() || this.owningScreen.allRequireWorldRestart,
                         this.configElement.requiresMcRestart() || this.owningScreen.allRequireMcRestart,
                         GuiConfig.getAbridgedConfigPath(SeasonsAPI.instance.cfg.toString()));
             }

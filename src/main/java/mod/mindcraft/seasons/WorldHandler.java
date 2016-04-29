@@ -90,24 +90,33 @@ public class WorldHandler {
 	@SubscribeEvent
 	public void debugInfo(RenderGameOverlayEvent.Text e) {
 		if (SeasonsAPI.instance.getCfg().enableTempDebug && Minecraft.getMinecraft().gameSettings.showDebugInfo) {
-			EntityPlayer p = Minecraft.getMinecraft().thePlayer;
-			float temp = (float) (Math.floor(SeasonsAPI.instance.getWorldInterface().getTemperature(new BlockPos(p.posX, p.posY, p.posZ)) * 100) / 100);
-			e.getLeft().add("\u00a7c[SAPI]\u00a7r" + (temp < SeasonsAPI.instance.cfg.hypothermiaStart ? "\u00a7b" : (temp > SeasonsAPI.instance.cfg.burntStart ? "\u00a74" : "")) + "External Temperature : " + temp + " C");
-			temp =(float) (Math.floor(SeasonsAPI.instance.getWorldInterface().getInternalTemperature(p) * 100) / 100);
-			e.getLeft().add("\u00a7c[SAPI]\u00a7r" + (temp < SeasonsAPI.instance.cfg.hypothermiaStart ? "\u00a7b" : (temp > SeasonsAPI.instance.cfg.burntStart ? "\u00a74" : "")) + "Internal Temperature : " + temp + " C");
 			e.getLeft().add("\u00a7c[SAPI]\u00a7rChunks in temperature map : " + tempMap.size());
-			if (!SeasonsAPI.instance.getCfg().seasonAlwaysVisible) {
-				long seasonLenght = 24000 * SeasonsAPI.instance.getCfg().seasonLenght;
-				e.getLeft().add("\u00a7c[SAPI]\u00a7rSeason : " + StringUtils.capitalize(SeasonsAPI.instance.getWorldInterface().getSeason().name().toLowerCase()) + " (" + (Math.floor((float)(Minecraft.getMinecraft().theWorld.getWorldTime() % seasonLenght) * 1000F / (float)seasonLenght) / 10F) + "%)");			
-			}
 		}
 		if (SeasonsAPI.instance.getCfg().seasonAlwaysVisible) {
 			long seasonLenght = 24000 * SeasonsAPI.instance.getCfg().seasonLenght;
-			e.getLeft().add("Season : " + StringUtils.capitalize(SeasonsAPI.instance.getWorldInterface().getSeason().name().toLowerCase()) + " (" + (Math.floor((float)(Minecraft.getMinecraft().theWorld.getWorldTime() % seasonLenght) * 1000F / (float)seasonLenght) / 10F) + "%)");
 			long year = (long) Math.floor((float)(((WorldInterface)SeasonsAPI.instance.getWorldInterface()).getWorld().getWorldTime() / ((float)seasonLenght * 4)));
 			long yearTime = (long) Math.floor(((float)((WorldInterface)SeasonsAPI.instance.getWorldInterface()).getWorld().getWorldTime() % ((float)seasonLenght * 4)) / 24000F);
-			e.getLeft().add("Year " + year + " Day " + yearTime);
+			if (SeasonsAPI.instance.getCfg().displayTemperatureRight) {
+				e.getRight().add("Season : " + StringUtils.capitalize(SeasonsAPI.instance.getWorldInterface().getSeason().name().toLowerCase()) + " (" + (Math.floor((float)(Minecraft.getMinecraft().theWorld.getWorldTime() % seasonLenght) * 1000F / (float)seasonLenght) / 10F) + "%)");
+				e.getRight().add("Year " + year + " Day " + yearTime);								
+			} else {
+				e.getLeft().add("Season : " + StringUtils.capitalize(SeasonsAPI.instance.getWorldInterface().getSeason().name().toLowerCase()) + " (" + (Math.floor((float)(Minecraft.getMinecraft().theWorld.getWorldTime() % seasonLenght) * 1000F / (float)seasonLenght) / 10F) + "%)");
+				e.getLeft().add("Year " + year + " Day " + yearTime);				
+			}
 		}
+		if (SeasonsAPI.instance.getCfg().displayTemperature) {
+			EntityPlayer p = Minecraft.getMinecraft().thePlayer;
+			float temp = (float) (Math.floor(SeasonsAPI.instance.getWorldInterface().getTemperature(new BlockPos(p.posX, p.posY, p.posZ)) * 100) / 100);
+			float temp2 =(float) (Math.floor(SeasonsAPI.instance.getWorldInterface().getInternalTemperature(p) * 100) / 100);
+			if (SeasonsAPI.instance.getCfg().displayTemperatureRight) {
+				e.getRight().add((temp < SeasonsAPI.instance.cfg.hypothermiaStart ? "\u00a7b" : (temp > SeasonsAPI.instance.cfg.burntStart ? "\u00a74" : "")) + "External Temperature : " + temp + " C");
+				e.getRight().add((temp2 < SeasonsAPI.instance.cfg.hypothermiaStart ? "\u00a7b" : (temp2 > SeasonsAPI.instance.cfg.burntStart ? "\u00a74" : "")) + "Internal Temperature : " + temp2 + " C");				
+			} else {
+				e.getLeft().add((temp < SeasonsAPI.instance.cfg.hypothermiaStart ? "\u00a7b" : (temp > SeasonsAPI.instance.cfg.burntStart ? "\u00a74" : "")) + "External Temperature : " + temp + " C");
+				e.getLeft().add((temp2 < SeasonsAPI.instance.cfg.hypothermiaStart ? "\u00a7b" : (temp2 > SeasonsAPI.instance.cfg.burntStart ? "\u00a74" : "")) + "Internal Temperature : " + temp2 + " C");				
+			}
+		}
+
 	}
 	
 	@SubscribeEvent

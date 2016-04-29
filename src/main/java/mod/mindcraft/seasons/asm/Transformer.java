@@ -1,25 +1,10 @@
 package mod.mindcraft.seasons.asm;
 
-import static org.objectweb.asm.Opcodes.ALOAD;
-import static org.objectweb.asm.Opcodes.ASTORE;
-import static org.objectweb.asm.Opcodes.FCMPL;
-import static org.objectweb.asm.Opcodes.FRETURN;
-import static org.objectweb.asm.Opcodes.GETFIELD;
-import static org.objectweb.asm.Opcodes.GETSTATIC;
-import static org.objectweb.asm.Opcodes.ICONST_0;
-import static org.objectweb.asm.Opcodes.ICONST_1;
-import static org.objectweb.asm.Opcodes.IFLE;
-import static org.objectweb.asm.Opcodes.IFNE;
-import static org.objectweb.asm.Opcodes.IF_ICMPGT;
-import static org.objectweb.asm.Opcodes.IF_ICMPLE;
-import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
-import static org.objectweb.asm.Opcodes.INVOKESTATIC;
-import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
-import static org.objectweb.asm.Opcodes.IRETURN;
-import static org.objectweb.asm.Opcodes.RETURN;
+import static org.objectweb.asm.Opcodes.*;
 
 import java.util.Iterator;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.IClassTransformer;
 
 import org.apache.logging.log4j.LogManager;
@@ -68,7 +53,41 @@ public class Transformer implements IClassTransformer {
 		else if (transformedName.equals("net.minecraft.client.renderer.color.BlockColors$3") || transformedName.equals("net.minecraft.client.renderer.color.BlockColors$1") || transformedName.equals("net.minecraft.client.renderer.color.BlockColors$10")) {
 			return transformBlockGrass(basicClass);
 		}
+		else if (transformedName.equals("net.minecraft.item.ItemArmor")) {
+			return transformItemArmor(basicClass);
+		}
 		return basicClass;
+	}
+	
+	private byte[] transformItemArmor(byte[] basicClass) {
+		logger.info("Starting BiomeGenBase Patch...");
+		ClassReader cr = new ClassReader(basicClass);
+		ClassNode cn = new ClassNode();
+		cr.accept(cn, 0);
+		cn.interfaces.add("mod/mindcraft/seasons/api/interfaces/ITemperatureModifier");
+		boolean obf = false;
+		for (MethodNode mn : cn.methods) {
+			if (mn.name.equals("a"))
+				obf = true;
+		}
+		{
+			logger.info("Adding getTemperature method...");
+			MethodNode method = new MethodNode();
+			method.access = ACC_PUBLIC;
+			method.desc = obf ? "(Ladq;F)F" : "(Lnet/minecraft/item/ItemStack;F)F";
+			method.name = "getTemperature";
+			method.exceptions = Lists.newArrayList();
+			method.instructions.add(new VarInsnNode(ALOAD, 1));
+			method.instructions.add(new VarInsnNode(FLOAD, 2));
+			method.instructions.add(new MethodInsnNode(INVOKESTATIC, "mod/mindcraft/seasons/helper/ArmorTemperatureHelper", "getArmorTemperature", method.desc, false));
+			method.instructions.add(new InsnNode(FRETURN));
+			method.visitMaxs(0, 0);
+			cn.methods.add(method);
+		}
+		logger.info("BiomeGenBase patch complete!");
+		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+		cn.accept(cw);
+		return cw.toByteArray();
 	}
 	
 	private byte[] transformBiomeGenBase(byte[] basicClass) {
@@ -115,7 +134,7 @@ public class Transformer implements IClassTransformer {
 			method.name = "isRainEnabled";
 			method.exceptions = Lists.newArrayList();
 			method.instructions.add(new VarInsnNode(ALOAD, 0));
-			method.instructions.add(new FieldInsnNode(GETFIELD, obf ? "aig" : "net/minecraft/world/biome/BiomeGenBase", obf ? "Q" : "enableRain", "Z"));
+			method.instructions.add(new FieldInsnNode(GETFIELD, obf ? "aig" : "net/minecraft/world/biome/BiomeGenBase", obf ? "G" : "enableRain", "Z"));
 			method.instructions.add(new InsnNode(IRETURN));
 			method.visitMaxs(0, 0);
 			cn.methods.add(method);
