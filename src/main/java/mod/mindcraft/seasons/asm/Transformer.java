@@ -108,7 +108,7 @@ public class Transformer implements IClassTransformer {
 				mn.instructions.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/interfaces/IWorldInterface", "getTemperature", "(L" + (obf ? "cj" : "net/minecraft/util/math/BlockPos") + ";)F", true));
 				mn.instructions.add(new InsnNode(FRETURN));
 			}
-			else if ((mn.name.equals("b") || mn.name.equals("generateBiomeTerrain")) && (mn.desc.equals("(Ladm;Ljava/util/Random;Lans;IID)V") || mn.desc.equals("(Lnet/minecraft/world/World;Ljava/util/Random;Lnet/minecraft/world/chunk/ChunkPrimer;IID)V"))) {
+			else if ((mn.name.equals("b") || mn.name.equals("generateBiomeTerrain")) && (mn.desc.equals("(Laht;Ljava/util/Random;Latf;IID)V") || mn.desc.equals("(Lnet/minecraft/world/World;Ljava/util/Random;Lnet/minecraft/world/chunk/ChunkPrimer;IID)V"))) {
 				logger.info("Patching generateBiomeTerrain...");
 				obf = mn.name.equals("b");	
 				InsnList newInsn = new InsnList();
