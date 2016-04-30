@@ -57,7 +57,7 @@ public class ChunkTemperature {
 			for (int x = -tempSpreadDist; x <= tempSpreadDist; x++) {
 				for (int z = -tempSpreadDist; z <= tempSpreadDist; z++) {
 					int dist = Math.abs(x) + Math.abs(y) + Math.abs(z);
-					if (dist == 0 || dist > 5)
+					if (dist == 0 || dist > tempSpreadDist)
 						continue;
 					BlockPos newPos = pos.add(x, y, z);
 					if (world.isAirBlock(newPos))
@@ -65,7 +65,7 @@ public class ChunkTemperature {
 					float temp = tempReg.getTemperatureForBlock(world.getBlockState(newPos));
 					if (temp == Integer.MIN_VALUE)
 						continue;
-					temp *= ((float)dist /(float)tempSpreadDist);
+					temp *= 1F - ((float)dist /(float)tempSpreadDist);
 					if (temp > maxTemp)
 						maxTemp = temp;
 				}

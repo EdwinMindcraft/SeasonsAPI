@@ -20,6 +20,7 @@ public class SeasonsCFG extends Configuration {
 	public float autumnGrowthMultiplier;
 	public float winterGrowthMultiplier;
 	public boolean seasonAlwaysVisible;
+	public boolean useUniformLeavesInAutumn;
 	public float summerRainfall;
 	public float springRainfall;
 	public float autumnRainfall;
@@ -69,6 +70,8 @@ public class SeasonsCFG extends Configuration {
 		springRainfall = getFloat("Spring Rainfall", "spring", 2F, 0F, 10F, "Rainfall in spring");
 		autumnRainfall = getFloat("Autumn Rainfall", "autumn", 3F, 0F, 10F, "Rainfall in autumn");
 		winterRainfall = getFloat("Winter Rainfall", "winter", 1F, 0F, 10F, "Rainfall in winter");
+		
+		useUniformLeavesInAutumn = getBoolean("Use Uniform Leaves", "autumn", false, "Enable this to use the uniform-red leaves in autumn");
 		
 		morningSeasonSet = getBoolean("Morning Season", "advanced", true, "Does the seasons command place you in the morning ?");
 		

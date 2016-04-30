@@ -44,15 +44,15 @@ public class LeavesGrassUtils {
 				
 				if (blockplanks$enumtype == BlockPlanks.EnumType.BIRCH)
 				{
-					return ColorizerUtils.mix(ColorizerFoliage.getFoliageColorBirch(), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, pos, worldInterface.getWorld().getWorldTime()), 0.25F);
+					return ColorizerUtils.mix(ColorizerFoliage.getFoliageColorBirch(), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, pos, worldInterface.getWorld().getWorldTime(), worldInterface.getWorld()), 0.25F);
 				}
 				if (blockplanks$enumtype == BlockPlanks.EnumType.JUNGLE)
 				{
-                    return ColorizerUtils.mix(BiomeColorHelper.getFoliageColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, pos, worldInterface.getWorld().getWorldTime()), 0.75F);
+                    return ColorizerUtils.mix(BiomeColorHelper.getFoliageColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, pos, worldInterface.getWorld().getWorldTime(), worldInterface.getWorld()), 0.75F);
 				}
 			}
 			
-            return ColorizerUtils.mix(BiomeColorHelper.getFoliageColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, pos, worldInterface.getWorld().getWorldTime()), 0.25F);        	
+            return ColorizerUtils.mix(BiomeColorHelper.getFoliageColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, pos, worldInterface.getWorld().getWorldTime(), worldInterface.getWorld()), 0.25F);        	
 		} catch (NullPointerException e) {
 			return BiomeColorHelper.getFoliageColorAtPos(world, pos);
 		}
@@ -65,7 +65,7 @@ public class LeavesGrassUtils {
 			return ColorizerGrass.getGrassColor(0.5D, 1.0D);
 		}
 		try {
-			return ColorizerUtils.mix(BiomeColorHelper.getGrassColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new GrassSeasonColorizer()).getColor(iblockstate, pos, worldInterface.getWorld().getWorldTime()), 0.75F);        	
+			return ColorizerUtils.mix(BiomeColorHelper.getGrassColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new GrassSeasonColorizer()).getColor(iblockstate, pos, worldInterface.getWorld().getWorldTime(), worldInterface.getWorld()), 0.5F);        	
 		} catch (NullPointerException e) {
 			return BiomeColorHelper.getGrassColorAtPos(world, pos);
 		}

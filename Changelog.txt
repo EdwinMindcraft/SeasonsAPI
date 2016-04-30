@@ -1,8 +1,15 @@
 1.1.1
 -Config option for temperature display
 -Config option for right side season and temperature display
--Added temperature to armors
--Config option to make seasons command place you at the beggining of the day
+-Added temperature to armours
+-Config option to make seasons command place you at the beginning of the day
+-Custom Temperature 
+   Format : mod:block:prop1,prop2...(leave blank to ignore state):temp
+-Due to lag during the rendering the grass and leaves temperature-colour scaling have been reverted to vanilla
+-Autumn leaves have 3 different colours (Can be diabled in Seasons-Autumn)
+-Grass is a more coloured
+-Config option to change the temperature spread range (default 5)
+-Fixed bug were the world wouldn't generate
 
 1.1.0
 -1.9 Update

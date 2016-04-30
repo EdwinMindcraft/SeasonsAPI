@@ -37,7 +37,6 @@ public class ConfigFactory implements IModGuiFactory {
 			list.add(new DummyConfigElement.DummyCategoryElement("seasonsseasons", I18n.format("seasonsapi.config.seasons"), ConfigSeasons.class));
 			list.add(new DummyConfigElement.DummyCategoryElement("seasonsadvanced", I18n.format("seasonsapi.config.advanced"), ConfigAdvanced.class));
 			list.add(new DummyConfigElement.DummyCategoryElement("seasonsarmor", I18n.format("seasonsapi.config.armor"), ConfigArmor.class));
-			
 			return list;
 		}
 		

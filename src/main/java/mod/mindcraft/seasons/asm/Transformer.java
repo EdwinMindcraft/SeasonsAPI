@@ -4,7 +4,6 @@ import static org.objectweb.asm.Opcodes.*;
 
 import java.util.Iterator;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.IClassTransformer;
 
 import org.apache.logging.log4j.LogManager;
@@ -60,7 +59,7 @@ public class Transformer implements IClassTransformer {
 	}
 	
 	private byte[] transformItemArmor(byte[] basicClass) {
-		logger.info("Starting BiomeGenBase Patch...");
+		logger.info("Starting ItemArmor Patch...");
 		ClassReader cr = new ClassReader(basicClass);
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
@@ -84,7 +83,7 @@ public class Transformer implements IClassTransformer {
 			method.visitMaxs(0, 0);
 			cn.methods.add(method);
 		}
-		logger.info("BiomeGenBase patch complete!");
+		logger.info("ItemArmor patch complete!");
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 		cn.accept(cw);
 		return cw.toByteArray();
@@ -101,7 +100,7 @@ public class Transformer implements IClassTransformer {
 			if ((mn.name.equals("a") || mn.name.equals("getFloatTemperature")) && (mn.desc.equals("(Lcj;)F") || mn.desc.equals("(Lnet/minecraft/util/math/BlockPos;)F"))) {
 				logger.info("Patching getFloatTemperature...");
 				obf = mn.name.equals("a");
-				oldInsn = mn.instructions;
+				oldInsn.insert(mn.instructions);
 				mn.instructions.clear();
 				mn.instructions.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/SeasonsAPI", "instance", "Lmod/mindcraft/seasons/api/SeasonsAPI;"));
 				mn.instructions.add(new MethodInsnNode(INVOKEVIRTUAL, "mod/mindcraft/seasons/api/SeasonsAPI", "getWorldInterface", "()Lmod/mindcraft/seasons/api/interfaces/IWorldInterface;", false));
@@ -109,7 +108,8 @@ public class Transformer implements IClassTransformer {
 				mn.instructions.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/interfaces/IWorldInterface", "getTemperature", "(L" + (obf ? "cj" : "net/minecraft/util/math/BlockPos") + ";)F", true));
 				mn.instructions.add(new InsnNode(FRETURN));
 			}
-			if ((mn.name.equals("b") || mn.name.equals("generateBiomeTerrain")) && (mn.desc.equals("(Ladm;Ljava/util/Random;Lans;IID)V") || mn.desc.equals("(Lnet/minecraft/world/World;Ljava/util/Random;Lnet/minecraft/world/chunk/ChunkPrimer;IID)V"))) {
+			else if ((mn.name.equals("b") || mn.name.equals("generateBiomeTerrain")) && (mn.desc.equals("(Ladm;Ljava/util/Random;Lans;IID)V") || mn.desc.equals("(Lnet/minecraft/world/World;Ljava/util/Random;Lnet/minecraft/world/chunk/ChunkPrimer;IID)V"))) {
+				logger.info("Patching generateBiomeTerrain...");
 				obf = mn.name.equals("b");	
 				InsnList newInsn = new InsnList();
 				Iterator<AbstractInsnNode> iter = mn.instructions.iterator();
@@ -118,8 +118,50 @@ public class Transformer implements IClassTransformer {
 					if (ain instanceof MethodInsnNode) {
 						MethodInsnNode min = (MethodInsnNode) ain;
 						if ((min.desc.equals("(Lcj;)F") || min.desc.equals("(Lnet/minecraft/util/math/BlockPos;)F")) && (min.name.equals("a") || min.name.equals("getFloatTemperature")) && (min.owner.equals("aig") || min.owner.equals("net/minecraft/world/biome/BiomeGenBase"))) {
+							logger.info("Located getFloatTemperature");
 							min.name = "getFloatTemperature_old";
-							ain = min;
+							newInsn.add(min);
+							continue;
+						}
+					}
+					newInsn.add(ain);
+				}
+				mn.instructions = newInsn;
+			}
+			else if ((mn.name.equals("c") || mn.name.equals("getFoliageColorAtPos")) && (mn.desc.equals("(Lcj;)I") || mn.desc.equals("(Lnet/minecraft/util/math/BlockPos;)I"))) {
+				logger.info("Patching getFoliageColorAtPos...");
+				obf = mn.name.equals("c");	
+				InsnList newInsn = new InsnList();
+				Iterator<AbstractInsnNode> iter = mn.instructions.iterator();
+				while (iter.hasNext()) {
+					AbstractInsnNode ain = (AbstractInsnNode) iter.next();
+					if (ain instanceof MethodInsnNode) {
+						MethodInsnNode min = (MethodInsnNode) ain;
+						if ((min.desc.equals("(Lcj;)F") || min.desc.equals("(Lnet/minecraft/util/math/BlockPos;)F")) && (min.name.equals("a") || min.name.equals("getFloatTemperature")) && (min.owner.equals("aig") || min.owner.equals("net/minecraft/world/biome/BiomeGenBase"))) {
+							logger.info("Located getFloatTemperature");
+							min.name = "getFloatTemperature_old";
+							newInsn.add(min);
+							continue;
+						}
+					}
+					newInsn.add(ain);
+				}
+				mn.instructions = newInsn;
+			}
+			else if ((mn.name.equals("b") || mn.name.equals("getGrassColorAtPos")) && (mn.desc.equals("(Lcj;)I") || mn.desc.equals("(Lnet/minecraft/util/math/BlockPos;)I"))) {
+				logger.info("Patching getGrassColorAtPos...");
+				obf = mn.name.equals("b");	
+				InsnList newInsn = new InsnList();
+				Iterator<AbstractInsnNode> iter = mn.instructions.iterator();
+				while (iter.hasNext()) {
+					AbstractInsnNode ain = (AbstractInsnNode) iter.next();
+					if (ain instanceof MethodInsnNode) {
+						MethodInsnNode min = (MethodInsnNode) ain;
+						if ((min.desc.equals("(Lcj;)F") || min.desc.equals("(Lnet/minecraft/util/math/BlockPos;)F")) && (min.name.equals("a") || min.name.equals("getFloatTemperature")) && (min.owner.equals("aig") || min.owner.equals("net/minecraft/world/biome/BiomeGenBase"))) {
+							logger.info("Located getFloatTemperature");
+							min.name = "getFloatTemperature_old";
+							newInsn.add(min);
+							continue;
 						}
 					}
 					newInsn.add(ain);

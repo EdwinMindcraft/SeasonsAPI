@@ -12,11 +12,13 @@ public class BlockTemperatureRegistry implements IBlockTemperatureRegistry {
 	private static final HashMap<Block, Boolean> ignoredStates = new HashMap<Block, Boolean>();
 	
 	@Override
-	public void addTemperatureToBlock(IBlockState state, float temperature, boolean ignoreState) {
-		if (!hasTemperature(state)) {
+	public boolean addTemperatureToBlock(IBlockState state, float temperature, boolean ignoreState, boolean override) {
+		if (override || !hasTemperature(state)) {
 			temperatures.put(state, temperature);
-			ignoredStates.put(state.getBlock(), ignoreState);			
+			ignoredStates.put(state.getBlock(), ignoreState);
+			return true;
 		}
+		return false;
 	}
 
 	@Override
@@ -44,6 +46,12 @@ public class BlockTemperatureRegistry implements IBlockTemperatureRegistry {
 			return temperatures.get(state);
 		}
 		return Integer.MIN_VALUE;
+	}
+
+	@Override
+	public void clear() {
+		temperatures.clear();
+		ignoredStates.clear();
 	}
 
 }

@@ -3,6 +3,7 @@ package mod.mindcraft.seasons.colorizer;
 import mod.mindcraft.seasons.api.interfaces.ISeasonColorizer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class GrassSeasonColorizer implements
 		ISeasonColorizer {
@@ -13,7 +14,7 @@ public class GrassSeasonColorizer implements
 	}
 
 	@Override
-	public int getSpringColor(IBlockState state, BlockPos pos) {
+	public int getSpringColor(IBlockState state, BlockPos pos, World world) {
 		return getSpringColor();
 	}
 
@@ -23,7 +24,7 @@ public class GrassSeasonColorizer implements
 	}
 
 	@Override
-	public int getSummerColor(IBlockState state, BlockPos pos) {
+	public int getSummerColor(IBlockState state, BlockPos pos, World world) {
 		return getSummerColor();
 	}
 
@@ -33,7 +34,7 @@ public class GrassSeasonColorizer implements
 	}
 
 	@Override
-	public int getAutumnColor(IBlockState state, BlockPos pos) {
+	public int getAutumnColor(IBlockState state, BlockPos pos, World world) {
 		return getAutumnColor();
 	}
 
@@ -43,7 +44,7 @@ public class GrassSeasonColorizer implements
 	}
 
 	@Override
-	public int getWinterColor(IBlockState state, BlockPos pos) {
+	public int getWinterColor(IBlockState state, BlockPos pos, World world) {
 		return getWinterColor();
 	}
 
