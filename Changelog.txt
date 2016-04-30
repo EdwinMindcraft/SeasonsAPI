@@ -7,6 +7,7 @@
 -Temperature reloading command (Was actually present in 1.1.1 but not registered so...)
 -Localization
 -Water is at 20 C
+-Actually Fixed bug were the world wouldn't generate
 
 1.1.1
 -Config option for temperature display
