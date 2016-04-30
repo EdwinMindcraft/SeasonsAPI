@@ -1,7 +1,7 @@
 package mod.mindcraft.seasons.api.interfaces;
 
-import mod.mindcraft.seasons.api.SeasonsAPI;
 import mod.mindcraft.seasons.api.enums.EnumSeason;
+import mod.mindcraft.seasons.api.init.SeasonsAPI;
 import mod.mindcraft.seasons.api.utils.ColorizerUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;

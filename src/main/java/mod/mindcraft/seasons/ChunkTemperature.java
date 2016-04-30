@@ -1,6 +1,6 @@
 package mod.mindcraft.seasons;
 
-import mod.mindcraft.seasons.api.SeasonsAPI;
+import mod.mindcraft.seasons.api.init.SeasonsAPI;
 import mod.mindcraft.seasons.api.interfaces.IBlockTemperatureRegistry;
 import mod.mindcraft.seasons.api.interfaces.IWorldInterface;
 import net.minecraft.nbt.NBTTagCompound;
@@ -47,10 +47,11 @@ public class ChunkTemperature {
 		this.temp[meta] = temp;
 	}
 	
-	public float calcBlockTemp(World world, BlockPos pos) {
+	public boolean calcBlockTemp(World world, BlockPos pos) {
 		int meta = (Math.abs(pos.getX()) % 16) + (Math.abs(pos.getZ()) % 16) * 16 + (Math.abs(pos.getY()) % 256) * 256;
 		int tempSpreadDist = SeasonsAPI.instance.getCfg().temperatureSpreadDistance;
 		float maxTemp = tempReg.getTemperatureForBlock(world.getBlockState(pos));
+		boolean hasTemp = false;
 		for (int y = -tempSpreadDist; y <= tempSpreadDist; y++) {
 			if (y + pos.getY() < 0 || y + pos.getY() > 256)
 				continue;
@@ -68,6 +69,7 @@ public class ChunkTemperature {
 					temp *= 1F - ((float)dist /(float)tempSpreadDist);
 					if (temp > maxTemp)
 						maxTemp = temp;
+					hasTemp = true;
 				}
 			}
 		}
@@ -75,12 +77,11 @@ public class ChunkTemperature {
 		timeTemp += timeTemp * (-Math.abs(64 - pos.getY()) / 64F);
 		if (maxTemp == Integer.MIN_VALUE) {
 			maxTemp = timeTemp;
-		}
-		else if ((maxTemp <= 0 && timeTemp < maxTemp) || (maxTemp > 0 && timeTemp > maxTemp)) {
-			maxTemp = timeTemp;
+		} else {
+			maxTemp = (maxTemp * 0.5F) + (timeTemp * 0.5F);
 		}
 		temp[meta] = maxTemp;
-		return maxTemp;
+		return hasTemp;
 	}
 	
 	public float calcBlockExternalTemp(World world, BlockPos pos) {

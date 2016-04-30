@@ -2,14 +2,15 @@ package mod.mindcraft.seasons;
 
 import java.util.HashMap;
 
-import mod.mindcraft.seasons.api.SeasonsAPI;
 import mod.mindcraft.seasons.api.enums.EnumSeason;
+import mod.mindcraft.seasons.api.init.SeasonsAPI;
 import mod.mindcraft.seasons.api.interfaces.ITemperatureModifier;
 import mod.mindcraft.seasons.api.interfaces.IWorldInterface;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 
@@ -54,6 +55,8 @@ public class WorldInterface implements IWorldInterface {
 			WorldHandler.tempMap = new HashMap<ChunkCoordIntPair, ChunkTemperature>();
 		float timeMultiplier = -(Math.abs(12000 - ((worldObj.getWorldTime() + 6000) % 24000))) / 6000F;
 		timeMultiplier++;
+		float timeTemp = getTemperatureForBiome(worldObj.getBiomeGenForCoords(pos));
+		timeTemp += timeTemp * (-Math.abs(64 - pos.getY()) / 64F);
 		if (external) {
 			try {
 				float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).calcBlockExternalTemp(worldObj, newPos);
@@ -74,19 +77,39 @@ public class WorldInterface implements IWorldInterface {
 		} else {
 			try {
 				float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).getTempForBlock(newPos);
-				temp += getSeason().temperatureDif;
-				temp += (getWorld().getBiomeGenForCoords(pos).getTemperature() * 12.5F * timeMultiplier);
-				if (!getWorld().canBlockSeeSky(pos)) temp /= 1.5;
-				return temp > 0 ? temp * getSeason().temperatureMultiplier : temp * getSeason().getOpposite().temperatureMultiplier;
+				float toAdd = getSeason().temperatureDif;
+				toAdd += ((getWorld().getBiomeGenForCoords(pos).getTemperature()) * 12.5F * timeMultiplier);
+				toAdd *= (((float)getWorld().getLightFor(EnumSkyBlock.SKY, newPos) / 15));
+				float newTemp = temp + toAdd;
+				//if (!getWorld().canBlockSeeSky(pos)) newTemp /= 1.5;
+				if (newTemp == 0)
+					newTemp = temp;
+				if (temp != timeTemp) {
+					temp -= timeTemp / 2;
+					temp *= 2;
+					if (Math.max(temp, newTemp) != 0)
+						newTemp *= 1- (Math.min(temp, newTemp) / Math.max(temp, newTemp));
+				}
+				return newTemp > 0 ? newTemp * getSeason().temperatureMultiplier : newTemp * getSeason().getOpposite().temperatureMultiplier;
 			} catch (NullPointerException e) {
-				ChunkTemperature temp = new ChunkTemperature();
-				temp.calcChunkTemp(getWorld(), getWorld().getChunkFromBlockCoords(newPos).xPosition * 16, getWorld().getChunkFromBlockCoords(newPos).zPosition * 16);
-				WorldHandler.tempMap.put(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair(), temp);
-				float temp2 = temp.getTempForBlock(newPos);
-				temp2 += getSeason().temperatureDif;
-				temp2 += (getWorld().getBiomeGenForCoords(pos).getTemperature() * 12.5F * timeMultiplier);
-				if (!getWorld().canBlockSeeSky(pos)) temp2 /= 1.5;
-				return temp2 > 0 ? temp2 * getSeason().temperatureMultiplier : temp2 * getSeason().getOpposite().temperatureMultiplier;
+				ChunkTemperature chunkTemp = new ChunkTemperature();
+				chunkTemp.calcChunkTemp(getWorld(), getWorld().getChunkFromBlockCoords(newPos).xPosition * 16, getWorld().getChunkFromBlockCoords(newPos).zPosition * 16);
+				WorldHandler.tempMap.put(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair(), chunkTemp);
+				float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).getTempForBlock(newPos);
+				float toAdd = getSeason().temperatureDif;
+				toAdd += (getWorld().getBiomeGenForCoords(pos).getTemperature() * 12.5F * timeMultiplier);
+				toAdd *= (1-((float)getWorld().getLightFor(EnumSkyBlock.SKY, newPos) / 15F) * timeMultiplier);
+				float newTemp = temp + toAdd;
+				if (!getWorld().canBlockSeeSky(pos)) newTemp /= 1.5;
+				if (newTemp == 0)
+					newTemp = temp;
+				if (temp != timeTemp) {
+					temp -= timeTemp / 2;
+					temp *= 2;
+					if (Math.max(temp, newTemp) != 0)
+						newTemp *= 1 - Math.abs((Math.min(temp, newTemp) / Math.max(temp, newTemp)));
+				}
+				return newTemp > 0 ? newTemp * getSeason().temperatureMultiplier : newTemp * getSeason().getOpposite().temperatureMultiplier;
 			}
 		}
 	}

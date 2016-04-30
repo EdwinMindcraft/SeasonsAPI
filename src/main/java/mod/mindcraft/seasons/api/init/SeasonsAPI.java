@@ -1,4 +1,4 @@
-package mod.mindcraft.seasons.api;
+package mod.mindcraft.seasons.api.init;
 
 import mod.mindcraft.seasons.api.interfaces.IBlockTemperatureRegistry;
 import mod.mindcraft.seasons.api.interfaces.IWorldInterface;

@@ -1,7 +1,7 @@
 package mod.mindcraft.seasons.colorizer;
 
 import mod.mindcraft.seasons.WorldInterface;
-import mod.mindcraft.seasons.api.SeasonsAPI;
+import mod.mindcraft.seasons.api.init.SeasonsAPI;
 import mod.mindcraft.seasons.api.interfaces.ISeasonColorizer;
 import mod.mindcraft.seasons.api.utils.ColorizerUtils;
 import net.minecraft.block.BlockOldLeaf;

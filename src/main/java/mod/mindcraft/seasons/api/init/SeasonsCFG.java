@@ -1,4 +1,4 @@
-package mod.mindcraft.seasons.api;
+package mod.mindcraft.seasons.api.init;
 
 import java.io.File;
 
@@ -19,15 +19,11 @@ public class SeasonsCFG extends Configuration {
 	public float springGrowthMultiplier;
 	public float autumnGrowthMultiplier;
 	public float winterGrowthMultiplier;
-	public boolean seasonAlwaysVisible;
 	public boolean useUniformLeavesInAutumn;
 	public float summerRainfall;
 	public float springRainfall;
 	public float autumnRainfall;
 	public float winterRainfall;
-	public boolean displayTemperature;
-	public boolean displayTemperatureRight;
-	public boolean displaySeasonRight;
 	
 	public boolean morningSeasonSet;
 	
@@ -39,13 +35,24 @@ public class SeasonsCFG extends Configuration {
 	
 	public int temperatureSpreadDistance;
 	
+	public ScreenCoordinates extTempCoord;
+	public ScreenCoordinates intTempCoord;
+	public ScreenCoordinates seasonCoord;
+	public ScreenCoordinates timeCoord;
+	
+	public double[] armorMul;
+	
 	public SeasonsCFG(File file) {
 		super(file);
 		reload();
 	}
 	
 	private float getArmorTemperature(String name, float def) {
-		return getFloat(name + " Armor Temperature", "armors", def, -100, 100, "How much temperature does the " + name.toLowerCase() + " armor add/remove ?");
+		return getFloat(name + " Armor Temperature", "armors."+name.toLowerCase(), def, -100, 100, "How much temperature does the " + name.toLowerCase() + " armor add/remove ?");
+	}
+	
+	private ScreenCoordinates getCoordinates(String category, float xPos, float yPos) {
+		return new ScreenCoordinates(getFloat("X", category, xPos, 0, 1F, "Position on the X axis"), getFloat("Y", category, yPos, 0, 1F, "Position on the Y axis"), getBoolean("Visible", category, true, "Is this object visible ?"), getBoolean("Invert", category, false, "Is the text starting on the right ?"));
 	}
 	
 	public void reload() {
@@ -58,30 +65,32 @@ public class SeasonsCFG extends Configuration {
 		burntStart = getInt("Burnt Start", "temperature", 80, -1000, 1000, "At which temperature does burnt starts - Hardcore Mode");
 		burntDiff = getInt("Burnt Level Difference", "temperature", 100, 1, 1000, "Temperature between burnt levels - Hardcore Mode");
 		enableTempDebug = getBoolean("Enable Debug", "advanced", true, "Enable the temperature display in the debug screen");
-		summerGrowthMultiplier = getFloat("Summer Growth Multiplier", "summer", 0F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
-		springGrowthMultiplier = getFloat("Spring Growth Multiplier", "spring", 0.75F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
-		autumnGrowthMultiplier = getFloat("Autumn Growth Multiplier", "autumn", -0.1F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
-		winterGrowthMultiplier = getFloat("Winter Growth Multiplier", "winter", -0.5F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
-		seasonAlwaysVisible = getBoolean("Season Always visible", "advanced", true, "Enable the temperature display on screen");
-		displayTemperature = getBoolean("Display Temperature", "advanced", true, "Enable the temperature display on screen");
-		displayTemperatureRight = getBoolean("Display Temperature Right", "advanced", false, "Display the temperature on the right side of the screen");
-		displaySeasonRight = getBoolean("Display Season Right", "advanced", false, "Display the season on the right side of the screen");
-		summerRainfall = getFloat("Summer Rainfall", "summer", 0.25F, 0F, 10F, "Rainfall in summer");
-		springRainfall = getFloat("Spring Rainfall", "spring", 2F, 0F, 10F, "Rainfall in spring");
-		autumnRainfall = getFloat("Autumn Rainfall", "autumn", 3F, 0F, 10F, "Rainfall in autumn");
-		winterRainfall = getFloat("Winter Rainfall", "winter", 1F, 0F, 10F, "Rainfall in winter");
+		summerGrowthMultiplier = getFloat("Summer Growth Multiplier", "seasons.summer", 0F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+		springGrowthMultiplier = getFloat("Spring Growth Multiplier", "seasons.spring", 0.75F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+		autumnGrowthMultiplier = getFloat("Autumn Growth Multiplier", "seasons.autumn", -0.1F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+		winterGrowthMultiplier = getFloat("Winter Growth Multiplier", "seasons.winter", -0.5F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+		summerRainfall = getFloat("Summer Rainfall", "seasons.summer", 0.25F, 0F, 10F, "Rainfall in summer");
+		springRainfall = getFloat("Spring Rainfall", "seasons.spring", 2F, 0F, 10F, "Rainfall in spring");
+		autumnRainfall = getFloat("Autumn Rainfall", "seasons.autumn", 3F, 0F, 10F, "Rainfall in autumn");
+		winterRainfall = getFloat("Winter Rainfall", "seasons.winter", 1F, 0F, 10F, "Rainfall in winter");
 		
-		useUniformLeavesInAutumn = getBoolean("Use Uniform Leaves", "autumn", false, "Enable this to use the uniform-red leaves in autumn");
+		useUniformLeavesInAutumn = getBoolean("Use Uniform Leaves", "seasons.autumn", false, "Enable this to use the uniform-red leaves in autumn");
 		
 		morningSeasonSet = getBoolean("Morning Season", "advanced", true, "Does the seasons command place you in the morning ?");
-		
-		leatherTemperature = getArmorTemperature("Leather", 10);
-		ironTemperature = getArmorTemperature("Iron", -20);
-		goldTemperature = getArmorTemperature("Gold", -10);
+		armorMul = get("armors", "Armor Multiplier", new double[]{0.25F, 0.25F, 0.25F, 0.25F}, "Armor multiplier",  0, 1, true, 4).getDoubleList();
+		leatherTemperature = getArmorTemperature("Leather", -10);
+		ironTemperature = getArmorTemperature("Iron", 20);
+		goldTemperature = getArmorTemperature("Gold", 10);
 		chainTemperature = getArmorTemperature("Chain", 0);
-		diamondTemperature = getArmorTemperature("Diamond", -10);
+		diamondTemperature = getArmorTemperature("Diamond", 10);
 		
 		temperatureSpreadDistance = getInt("Temperature Spread Distance", "advanced", 5, 0, 15, "Distance over which the temperature spreads");
+		
+		extTempCoord = getCoordinates("rendering.exttemperature", 0F, 0F);
+		intTempCoord = getCoordinates("rendering.inttemperature", 0F, 0.04F);
+		seasonCoord = getCoordinates("rendering.seasons", 0F, 0.08F);
+		timeCoord = getCoordinates("rendering.time", 0F, 0.12F);
+		
 		save();
 	}
 	
@@ -93,6 +102,18 @@ public class SeasonsCFG extends Configuration {
 		case WINTER: return winterRainfall;
 		default:
 			return 0;
+		}
+	}
+	
+	public static class ScreenCoordinates {
+		
+		public float x, y;
+		public boolean display, invert;
+		public ScreenCoordinates(float x, float y, boolean display, boolean invert) {
+			this.x = x;
+			this.y = y;
+			this.display = display;
+			this.invert = invert;
 		}
 	}
 }

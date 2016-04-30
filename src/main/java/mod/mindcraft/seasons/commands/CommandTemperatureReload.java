@@ -1,7 +1,7 @@
 package mod.mindcraft.seasons.commands;
 
 import mod.mindcraft.seasons.Seasons;
-import mod.mindcraft.seasons.api.SeasonsAPI;
+import mod.mindcraft.seasons.api.init.SeasonsAPI;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -22,8 +22,8 @@ public class CommandTemperatureReload extends CommandBase {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		SeasonsAPI.instance.getBlockTemperatureRegistry().clear();
-		Seasons.tempReader.readTemperaturesFromFile();
 		Seasons.instance.addTemperatures();
+		Seasons.tempReader.readTemperaturesFromFile();
 	}
 
 }

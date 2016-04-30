@@ -1,3 +1,11 @@
+1.1.2
+-Temperature fix (Again) : temperature is now scaled with sunlight.
+-Potions : Snowball and Fire charge
+-Armour piece temperature scaling (Config)
+-Special handler for display : Rendering config
+-Temperature reloading command (Was actually present in 1.1.1 but not registered so...)
+-Localization
+
 1.1.1
 -Config option for temperature display
 -Config option for right side season and temperature display
@@ -6,7 +14,7 @@
 -Custom Temperature 
    Format : mod:block:prop1,prop2...(leave blank to ignore state):temp
 -Due to lag during the rendering the grass and leaves temperature-colour scaling have been reverted to vanilla
--Autumn leaves have 3 different colours (Can be diabled in Seasons-Autumn)
+-Autumn leaves have 3 different colours (Can be disabled in Seasons-Autumn)
 -Grass is a more coloured
 -Config option to change the temperature spread range (default 5)
 -Fixed bug were the world wouldn't generate

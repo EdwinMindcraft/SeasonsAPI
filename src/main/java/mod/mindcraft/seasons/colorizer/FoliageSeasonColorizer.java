@@ -2,7 +2,7 @@ package mod.mindcraft.seasons.colorizer;
 
 import java.util.Random;
 
-import mod.mindcraft.seasons.api.SeasonsAPI;
+import mod.mindcraft.seasons.api.init.SeasonsAPI;
 import mod.mindcraft.seasons.api.interfaces.ISeasonColorizer;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.BlockOldLeaf;

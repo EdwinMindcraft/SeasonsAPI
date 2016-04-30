@@ -1,10 +1,12 @@
 seasonsseasons=Seasons Settings
 seasonstemperature=Temperature Settings
 seasonsadvanced=Advanced Settings
-seasonsspring=Spring Settings
-seasonswinter=Winter Settings
-seasonssummer=Summer Settings
-seasonsautumn=Autumn Settings
+seasonsarmor=Armor Settings
+spring=Spring Settings
+winter=Winter Settings
+summer=Summer Settings
+autumn=Autumn Settings
+seasonsrendering=Rendering Settings
 
 commands.seasons.spring=Set season to Spring of year %d
 commands.seasons.summer=Set season to Summer of year %d
@@ -14,3 +16,15 @@ commands.seasons.usage=/seasons <spring|summer|autumn|winter> <year>
 
 seasons:hypothermia=Hypothermia
 seasons:burnt=Burnt
+
+potion.effect.hypothermia=Potion of Hypothermia
+potion.effect.burnt=Potion of Burnt
+
+splash_potion.effect.hypothermia=Splash Potion of Hypothermia
+splash_potion.effect.burnt=Splash Potion of Burnt
+
+lingering_potion.effect.hypothermia=Lingering Potion of Hypothermia
+lingering_potion.effect.burnt=Lingering Potion of Burnt
+
+tipped_arrow.effect.hypothermia=Arrow of Hypothermia
+tipped_arrow.effect.burnt=Arrow of Burnt
