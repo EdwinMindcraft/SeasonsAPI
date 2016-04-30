@@ -1,5 +1,6 @@
 1.1.2
 -Temperature fix (Again) : temperature is now scaled with sunlight.
+-Temperature fix (Yep Another one...) temperature now properly scales
 -Potions : Snowball and Fire charge
 -Armour piece temperature scaling (Config)
 -Special handler for display : Rendering config
