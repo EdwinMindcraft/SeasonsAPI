@@ -79,7 +79,7 @@ public class WorldInterface implements IWorldInterface {
 				float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).getTempForBlock(newPos);
 				float toAdd = getSeason().temperatureDif;
 				toAdd += ((getWorld().getBiomeGenForCoords(pos).getTemperature()) * 12.5F * timeMultiplier);
-				toAdd *= (((float)getWorld().getLightFor(EnumSkyBlock.SKY, newPos) / 15));
+				toAdd *= ((float)getWorld().getLightFor(EnumSkyBlock.SKY, newPos) / 15);
 				float newTemp = temp + toAdd;
 				//if (!getWorld().canBlockSeeSky(pos)) newTemp /= 1.5;
 				if (newTemp == 0)
@@ -87,8 +87,7 @@ public class WorldInterface implements IWorldInterface {
 				if (temp != timeTemp) {
 					temp -= timeTemp / 2;
 					temp *= 2;
-					if (Math.max(temp, newTemp) != 0)
-						newTemp *= 1- (Math.min(temp, newTemp) / Math.max(temp, newTemp));
+					newTemp = newTemp*0.5F + temp * 0.5F;
 				}
 				return newTemp > 0 ? newTemp * getSeason().temperatureMultiplier : newTemp * getSeason().getOpposite().temperatureMultiplier;
 			} catch (NullPointerException e) {
@@ -106,8 +105,6 @@ public class WorldInterface implements IWorldInterface {
 				if (temp != timeTemp) {
 					temp -= timeTemp / 2;
 					temp *= 2;
-					if (Math.max(temp, newTemp) != 0)
-						newTemp *= 1 - Math.abs((Math.min(temp, newTemp) / Math.max(temp, newTemp)));
 				}
 				return newTemp > 0 ? newTemp * getSeason().temperatureMultiplier : newTemp * getSeason().getOpposite().temperatureMultiplier;
 			}

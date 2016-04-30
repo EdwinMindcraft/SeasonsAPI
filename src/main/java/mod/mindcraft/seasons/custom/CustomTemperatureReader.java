@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import mod.mindcraft.seasons.api.init.SeasonsAPI;
@@ -30,8 +31,12 @@ public class CustomTemperatureReader {
 		try {
 			if (!in.getParentFile().exists())
 				in.getParentFile().mkdirs();
-			if (!in.exists())
+			if (!in.exists()) {
 				in.createNewFile();
+				PrintWriter writer = new PrintWriter(in);
+				writer.print("#Format : modid:block:state:temperature\n#Exemple : minecraft:end_rod:facing=up:-10\n#This will make the upward end_rod be at -10 C\n#Leaving the state blank will make it ignore state");
+				writer.close();
+			}
 			BufferedReader nr = new BufferedReader(new FileReader(in));
 			while (true) {
 				String ln = nr.readLine();
@@ -40,7 +45,8 @@ public class CustomTemperatureReader {
 				int comment = ln.indexOf("#");
 				if (comment != -1)
 					ln = ln.substring(0, comment);
-				file.add(ln);
+				if (ln.length() != 0)
+					file.add(ln);
 			}
 			nr.close();
 		} catch (FileNotFoundException e) {

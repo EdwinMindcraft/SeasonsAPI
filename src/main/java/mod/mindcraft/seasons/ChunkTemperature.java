@@ -3,6 +3,7 @@ package mod.mindcraft.seasons;
 import mod.mindcraft.seasons.api.init.SeasonsAPI;
 import mod.mindcraft.seasons.api.interfaces.IBlockTemperatureRegistry;
 import mod.mindcraft.seasons.api.interfaces.IWorldInterface;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
@@ -67,14 +68,14 @@ public class ChunkTemperature {
 					if (temp == Integer.MIN_VALUE)
 						continue;
 					temp *= 1F - ((float)dist /(float)tempSpreadDist);
-					if (temp > maxTemp)
+					if (maxTemp == Integer.MIN_VALUE || Math.abs(temp) > Math.abs(maxTemp))
 						maxTemp = temp;
 					hasTemp = true;
 				}
 			}
 		}
 		float timeTemp = wInt.getTemperatureForBiome(world.getBiomeGenForCoords(pos));
-		timeTemp += timeTemp * (-Math.abs(64 - pos.getY()) / 64F);
+		timeTemp += timeTemp * (-Math.abs(64F - pos.getY()) / 64F);
 		if (maxTemp == Integer.MIN_VALUE) {
 			maxTemp = timeTemp;
 		} else {

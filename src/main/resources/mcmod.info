@@ -5,11 +5,11 @@
   "description": "Add a season system to minecraft",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
+  "url": "http://minecraft.curseforge.com/projects/season-api",
   "updateUrl": "",
   "authorList": ["EdwinMindcraft"],
   "credits": "",
-  "logoFile": "",
+  "logoFile": "Logo.png",
   "screenshots": [],
   "dependencies": []
 }

@@ -102,8 +102,8 @@ public class Transformer implements IClassTransformer {
 				obf = mn.name.equals("a");
 				oldInsn.insert(mn.instructions);
 				mn.instructions.clear();
-				mn.instructions.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/SeasonsAPI", "instance", "Lmod/mindcraft/seasons/api/SeasonsAPI;"));
-				mn.instructions.add(new MethodInsnNode(INVOKEVIRTUAL, "mod/mindcraft/seasons/api/SeasonsAPI", "getWorldInterface", "()Lmod/mindcraft/seasons/api/interfaces/IWorldInterface;", false));
+				mn.instructions.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/init/SeasonsAPI", "instance", "Lmod/mindcraft/seasons/api/init/SeasonsAPI;"));
+				mn.instructions.add(new MethodInsnNode(INVOKEVIRTUAL, "mod/mindcraft/seasons/api/init/SeasonsAPI", "getWorldInterface", "()Lmod/mindcraft/seasons/api/interfaces/IWorldInterface;", false));
 				mn.instructions.add(new VarInsnNode(ALOAD, 1));
 				mn.instructions.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/interfaces/IWorldInterface", "getTemperature", "(L" + (obf ? "cj" : "net/minecraft/util/math/BlockPos") + ";)F", true));
 				mn.instructions.add(new InsnNode(FRETURN));
@@ -289,8 +289,8 @@ public class Transformer implements IClassTransformer {
 				logger.info("Patching updateTick...");
 				InsnList insn = new InsnList();
 				LabelNode end = new LabelNode();
-				insn.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/SeasonsAPI", "instance", "Lmod/mindcraft/seasons/api/SeasonsAPI;"));
-				insn.add(new MethodInsnNode(INVOKEVIRTUAL, "mod/mindcraft/seasons/api/SeasonsAPI", "getWorldInterface", "()Lmod/mindcraft/seasons/api/interfaces/IWorldInterface;", false));
+				insn.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/init/SeasonsAPI", "instance", "Lmod/mindcraft/seasons/api/init/SeasonsAPI;"));
+				insn.add(new MethodInsnNode(INVOKEVIRTUAL, "mod/mindcraft/seasons/api/init/SeasonsAPI", "getWorldInterface", "()Lmod/mindcraft/seasons/api/interfaces/IWorldInterface;", false));
 				insn.add(new VarInsnNode(ALOAD, 2));
 				insn.add(new InsnNode(ICONST_1));
 				insn.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/interfaces/IWorldInterface", "getTemperature", obf ? "(Lcj;Z)F" : "(Lnet/minecraft/util/math/BlockPos;Z)F", true));
@@ -333,8 +333,8 @@ public class Transformer implements IClassTransformer {
 				logger.info("Patching updateTick...");
 				InsnList insn = new InsnList();
 				LabelNode end = new LabelNode();
-				insn.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/SeasonsAPI", "instance", "Lmod/mindcraft/seasons/api/SeasonsAPI;"));
-				insn.add(new MethodInsnNode(INVOKEVIRTUAL, "mod/mindcraft/seasons/api/SeasonsAPI", "getWorldInterface", "()Lmod/mindcraft/seasons/api/interfaces/IWorldInterface;", false));
+				insn.add(new FieldInsnNode(GETSTATIC, "mod/mindcraft/seasons/api/init/SeasonsAPI", "instance", "Lmod/mindcraft/seasons/api/init/SeasonsAPI;"));
+				insn.add(new MethodInsnNode(INVOKEVIRTUAL, "mod/mindcraft/seasons/api/init/SeasonsAPI", "getWorldInterface", "()Lmod/mindcraft/seasons/api/interfaces/IWorldInterface;", false));
 				insn.add(new VarInsnNode(ALOAD, 2));
 				insn.add(new InsnNode(ICONST_1));
 				insn.add(new MethodInsnNode(INVOKEINTERFACE, "mod/mindcraft/seasons/api/interfaces/IWorldInterface", "getTemperature", obf ? "(Lcj;Z)F" : "(Lnet/minecraft/util/math/BlockPos;Z)F", true));

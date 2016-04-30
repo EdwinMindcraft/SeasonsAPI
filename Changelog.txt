@@ -5,6 +5,7 @@
 -Special handler for display : Rendering config
 -Temperature reloading command (Was actually present in 1.1.1 but not registered so...)
 -Localization
+-Water is at 20 C
 
 1.1.1
 -Config option for temperature display
