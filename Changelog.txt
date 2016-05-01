@@ -1,3 +1,6 @@
+1.1.2a
+-Fixed crash when changing dimension
+
 1.1.2
 -Temperature fix (Again) : temperature is now scaled with sunlight.
 -Temperature fix (Yep Another one...) temperature now properly scales

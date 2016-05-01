@@ -100,7 +100,7 @@ public class WorldHandler {
 	public void drawOverlay(TickEvent.RenderTickEvent e) {
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayer p = mc.thePlayer;
-		if (mc.thePlayer == null || mc.theWorld == null || !mc.inGameHasFocus)
+		if (mc.thePlayer == null || mc.theWorld == null || !mc.inGameHasFocus || ((WorldInterface)SeasonsAPI.instance.getWorldInterface()).getWorld() == null)
 			return;
 		ScreenCoordinates extCoord = SeasonsAPI.instance.cfg.extTempCoord;
 		ScreenCoordinates intCoord = SeasonsAPI.instance.cfg.intTempCoord;
