@@ -1,5 +1,6 @@
 package mod.mindcraft.seasons;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import mod.mindcraft.seasons.api.enums.EnumSeason;
@@ -13,6 +14,7 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 public class WorldInterface implements IWorldInterface {
 	
@@ -46,6 +48,17 @@ public class WorldInterface implements IWorldInterface {
 	
 	@Override
 	public float getTemperature(BlockPos pos, boolean external) {
+		if (!Seasons.enabled) {
+			try {
+				return (Float) ReflectionHelper.findMethod(BiomeGenBase.class, worldObj.getBiomeGenForCoords(pos), new String[] {"getFloatTemperature_old"}, BlockPos.class).invoke(worldObj.getBiomeGenForCoords(pos), pos);
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
 		if (pos == null)
 			return 0F;
 		BlockPos newPos = pos.down().up();

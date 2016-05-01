@@ -34,9 +34,6 @@ public class Transformer implements IClassTransformer {
 		if (transformedName.equals("net.minecraft.world.biome.BiomeGenBase")) {
 			return transformBiomeGenBase(basicClass);
 		}
-		else if (transformedName.equals("net.minecraft.client.renderer.color.BlockColors$4") || transformedName.equals("net.minecraft.client.renderer.color.BlockColors$5")) {
-			return transformBlockLeaves(basicClass);
-		}
 		else if (transformedName.equals("net.minecraft.world.World")) {
 			return transformWorld(basicClass);
 		}
@@ -48,9 +45,6 @@ public class Transformer implements IClassTransformer {
 		}
 		else if (transformedName.equals("net.minecraft.block.BlockSnow")) {
 			return transformBlockSnow(basicClass);
-		}
-		else if (transformedName.equals("net.minecraft.client.renderer.color.BlockColors$3") || transformedName.equals("net.minecraft.client.renderer.color.BlockColors$1") || transformedName.equals("net.minecraft.client.renderer.color.BlockColors$10")) {
-			return transformBlockGrass(basicClass);
 		}
 		else if (transformedName.equals("net.minecraft.item.ItemArmor")) {
 			return transformItemArmor(basicClass);
@@ -192,52 +186,6 @@ public class Transformer implements IClassTransformer {
 			cn.methods.add(method);
 		}
 		logger.info("BiomeGenBase patch complete!");
-		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-		cn.accept(cw);
-		return cw.toByteArray();
-	}
-	
-	private byte[] transformBlockLeaves(byte[] basicClass) {
-		logger.info("Starting BlockLeaves Patch...");
-		ClassReader cr = new ClassReader(basicClass);
-		ClassNode cn = new ClassNode();
-		cr.accept(cn, 0);
-		for (MethodNode mn : cn.methods) {
-			if ((mn.name.equals("a") || mn.name.equals("colorMultiplier")) && (mn.desc.equals("(Larc;Lahx;Lcj;I)I") || mn.desc.equals("(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;I)I"))) {
-				boolean obf = mn.name.equals("a");
-				logger.info("Patching colorMultiplier...");
-				mn.instructions.clear();
-				mn.instructions.add(new VarInsnNode(ALOAD, 1));
-				mn.instructions.add(new VarInsnNode(ALOAD, 2));
-				mn.instructions.add(new VarInsnNode(ALOAD, 3));
-				mn.instructions.add(new MethodInsnNode(INVOKESTATIC, "mod/mindcraft/seasons/colorizer/LeavesGrassUtils", "getLeavesColor", obf ? "(Larc;Lahx;Lcj;)I" : "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)I", false));
-				mn.instructions.add(new InsnNode(IRETURN));
-			}
-		}
-		logger.info("BlockLeaves patch complete!");
-		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-		cn.accept(cw);
-		return cw.toByteArray();
-	}
-	
-	private byte[] transformBlockGrass(byte[] basicClass) {
-		logger.info("Starting Grass Patch...");
-		ClassReader cr = new ClassReader(basicClass);
-		ClassNode cn = new ClassNode();
-		cr.accept(cn, 0);
-		for (MethodNode mn : cn.methods) {
-			if ((mn.name.equals("a") || mn.name.equals("colorMultiplier")) && (mn.desc.equals("(Larc;Lahx;Lcj;I)I") || mn.desc.equals("(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;I)I"))) {
-				boolean obf = mn.name.equals("a");
-				logger.info("Patching colorMultiplier...");
-				mn.instructions.clear();
-				mn.instructions.add(new VarInsnNode(ALOAD, 1));
-				mn.instructions.add(new VarInsnNode(ALOAD, 2));
-				mn.instructions.add(new VarInsnNode(ALOAD, 3));
-				mn.instructions.add(new MethodInsnNode(INVOKESTATIC, "mod/mindcraft/seasons/colorizer/LeavesGrassUtils", "getGrassColor", obf ? "(Larc;Lahx;Lcj;)I" : "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)I", false));
-				mn.instructions.add(new InsnNode(IRETURN));
-			}
-		}
-		logger.info("Grass patch complete!");
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 		cn.accept(cw);
 		return cw.toByteArray();

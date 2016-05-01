@@ -6,6 +6,7 @@ import mod.mindcraft.seasons.api.init.SeasonPotion;
 import mod.mindcraft.seasons.api.init.SeasonsAPI;
 import mod.mindcraft.seasons.api.init.SeasonsCFG;
 import mod.mindcraft.seasons.api.interfaces.IBlockTemperatureRegistry;
+import mod.mindcraft.seasons.colorizer.LeavesGrassUtils;
 import mod.mindcraft.seasons.commands.CommandSeason;
 import mod.mindcraft.seasons.commands.CommandTemperatureReload;
 import mod.mindcraft.seasons.custom.CustomTemperatureReader;
@@ -26,6 +27,8 @@ public class Seasons {
 	public static Seasons instance;
 	
 	public static CustomTemperatureReader tempReader;
+	
+	public static boolean enabled = true;
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent e) {
@@ -56,6 +59,7 @@ public class Seasons {
 	@EventHandler
 	public void postInit (FMLPostInitializationEvent e) {
 		tempReader.readTemperaturesFromFile();
+		LeavesGrassUtils.registerColors();
 	}
 	
 	@EventHandler

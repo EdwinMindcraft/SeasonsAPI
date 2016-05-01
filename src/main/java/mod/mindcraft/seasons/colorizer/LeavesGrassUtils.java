@@ -1,36 +1,34 @@
 package mod.mindcraft.seasons.colorizer;
 
+import java.util.ArrayList;
+import java.util.Map;
+
+import mod.mindcraft.seasons.Seasons;
 import mod.mindcraft.seasons.WorldInterface;
 import mod.mindcraft.seasons.api.init.SeasonsAPI;
 import mod.mindcraft.seasons.api.interfaces.ISeasonColorizer;
 import mod.mindcraft.seasons.api.utils.ColorizerUtils;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
-import net.minecraft.block.BlockTallGrass;
-import net.minecraft.block.BlockTallGrass.EnumType;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.color.BlockColors;
+import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ColorizerFoliage;
-import net.minecraft.world.ColorizerGrass;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.biome.BiomeColorHelper;
+import net.minecraftforge.fml.common.registry.RegistryDelegate;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 public class LeavesGrassUtils {
 	
 	private static WorldInterface worldInterface = ((WorldInterface)SeasonsAPI.instance.getWorldInterface());
 	
-	public static int getLeavesColor(IBlockState iblockstate, IBlockAccess world, BlockPos pos) {
+	public static int getLeavesColor(IBlockState iblockstate, IBlockAccess world, BlockPos pos, int originalColor) {
 		if (world == null || pos == null) {
-			
-			if (iblockstate.getBlock().equals(Blocks.leaves)) {
-				BlockPlanks.EnumType blockplanks$enumtype = (BlockPlanks.EnumType)iblockstate.getValue(BlockOldLeaf.VARIANT);
-				if (blockplanks$enumtype == BlockPlanks.EnumType.SPRUCE)
-					return ColorizerFoliage.getFoliageColorPine();
-				if (blockplanks$enumtype == BlockPlanks.EnumType.BIRCH)
-					return ColorizerFoliage.getFoliageColorBirch();
-			}
-			return ColorizerFoliage.getFoliageColorBasic();
+			return originalColor;
 		}
 		try {
 			if (iblockstate.getBlock().equals(Blocks.leaves))
@@ -41,33 +39,69 @@ public class LeavesGrassUtils {
 				{
 					return ColorizerFoliage.getFoliageColorPine();
 				}
-				
-				if (blockplanks$enumtype == BlockPlanks.EnumType.BIRCH)
-				{
-					return ColorizerUtils.mix(ColorizerFoliage.getFoliageColorBirch(), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, pos, worldInterface.getWorld().getWorldTime(), worldInterface.getWorld()), 0.25F);
-				}
 				if (blockplanks$enumtype == BlockPlanks.EnumType.JUNGLE)
 				{
-                    return ColorizerUtils.mix(BiomeColorHelper.getFoliageColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, pos, worldInterface.getWorld().getWorldTime(), worldInterface.getWorld()), 0.33F);
+                    return ColorizerUtils.mix(originalColor, new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, pos, worldInterface.getWorld().getWorldTime(), worldInterface.getWorld()), 0.33F);
 				}
 			}
 			
-            return ColorizerUtils.mix(BiomeColorHelper.getFoliageColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, pos, worldInterface.getWorld().getWorldTime(), worldInterface.getWorld()), 0.25F);        	
+            return ColorizerUtils.mix(originalColor, new ISeasonColorizer.Wrapper(new FoliageSeasonColorizer()).getColor(iblockstate, pos, worldInterface.getWorld().getWorldTime(), worldInterface.getWorld()), 0.25F);        	
 		} catch (NullPointerException e) {
-			return BiomeColorHelper.getFoliageColorAtPos(world, pos);
+			return originalColor;
 		}
 	}
 	
-	public static int getGrassColor(IBlockState iblockstate, IBlockAccess world, BlockPos pos) {
+	public static int getGrassColor(IBlockState iblockstate, IBlockAccess world, BlockPos pos, int originalColor) {
 		if (world == null || pos == null) {
-			if ((iblockstate.getBlock().equals(Blocks.double_plant) || (iblockstate.getBlock().equals(Blocks.tallgrass) && iblockstate.getValue(BlockTallGrass.TYPE).equals(EnumType.DEAD_BUSH))))
-				return -1;
-			return ColorizerGrass.getGrassColor(0.5D, 1.0D);
+			return originalColor;
 		}
 		try {
-			return ColorizerUtils.mix(BiomeColorHelper.getGrassColorAtPos(world, pos), new ISeasonColorizer.Wrapper(new GrassSeasonColorizer()).getColor(iblockstate, pos, worldInterface.getWorld().getWorldTime(), worldInterface.getWorld()), 0.5F);        	
+			return ColorizerUtils.mix(originalColor, new ISeasonColorizer.Wrapper(new GrassSeasonColorizer()).getColor(iblockstate, pos, worldInterface.getWorld().getWorldTime(), worldInterface.getWorld()), 0.5F);        	
 		} catch (NullPointerException e) {
-			return BiomeColorHelper.getGrassColorAtPos(world, pos);
+			return originalColor;
 		}
+	}
+	
+	public static void registerColors() {
+		BlockColors colors = Minecraft.getMinecraft().getBlockColors();
+		Map<RegistryDelegate<Block>, IBlockColor> map = ReflectionHelper.getPrivateValue(BlockColors.class, colors, "blockColorMap");
+		ArrayList<Block> leavesBlock = new ArrayList<Block>();
+		ArrayList<Block> grassBlock = new ArrayList<Block>();
+		leavesBlock.add(Blocks.leaves);
+		leavesBlock.add(Blocks.leaves2);
+		leavesBlock.add(Blocks.vine);
+		grassBlock.add(Blocks.double_plant);
+		grassBlock.add(Blocks.grass);
+		grassBlock.add(Blocks.tallgrass);
+		for(Block b : leavesBlock) {
+			IBlockColor color = map.get(b.delegate);
+			if(color != null)
+				colors.registerBlockColorHandler(getFoliageColor(color), b);
+		}
+		for(Block b : grassBlock) {
+			IBlockColor color = map.get(b.delegate);
+			if(color != null)
+				colors.registerBlockColorHandler(getGrassColor(color), b);
+		}
+	}
+	
+	private static IBlockColor getFoliageColor (final IBlockColor original) {
+		return new IBlockColor() {
+			
+			@Override
+			public int colorMultiplier(IBlockState state, IBlockAccess p_186720_2_, BlockPos pos, int tintIndex) {
+				return Seasons.enabled ? LeavesGrassUtils.getLeavesColor(state, p_186720_2_, pos, original.colorMultiplier(state, p_186720_2_, pos, tintIndex)) : original.colorMultiplier(state, p_186720_2_, pos, tintIndex);
+			}
+		};
+	}
+	
+	private static IBlockColor getGrassColor (final IBlockColor original) {
+		return new IBlockColor() {
+			
+			@Override
+			public int colorMultiplier(IBlockState state, IBlockAccess p_186720_2_, BlockPos pos, int tintIndex) {
+				return Seasons.enabled ? LeavesGrassUtils.getGrassColor(state, p_186720_2_, pos, original.colorMultiplier(state, p_186720_2_, pos, tintIndex)) : original.colorMultiplier(state, p_186720_2_, pos, tintIndex);
+			}
+		};
 	}
 }

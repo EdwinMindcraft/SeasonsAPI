@@ -25,6 +25,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,6 +35,8 @@ public class WorldHandler {
 	
 	@SubscribeEvent
 	public void onBlockUpdate(BlockEvent.NeighborNotifyEvent e) {
+		if (!Seasons.enabled)
+			return;
 		BlockPos pos = e.getPos();
 		try {
 			if ((e.getState().getBlock() instanceof ITemperatureUpdater ? !SeasonsAPI.instance.getBlockTemperatureRegistry().hasTemperature(e.getState()) : !((ITemperatureUpdater)e.getState().getBlock()).requiresTemperatureUpdate(e.getWorld(), e.getState(), e.getPos())))
@@ -47,6 +50,8 @@ public class WorldHandler {
 	
 	@SubscribeEvent
 	public void onCropsUpdate(CropsUpdateEvent e) {
+		if (!Seasons.enabled)
+			return;
 		if (e.getWorld().getLightFromNeighbors(e.getPos().up()) >= 9) {
 			int i = ((Integer)e.state.getValue(BlockCrops.AGE)).intValue();
 			if (i < 7) {
@@ -91,6 +96,8 @@ public class WorldHandler {
 	
 	@SubscribeEvent
 	public void debugInfo(RenderGameOverlayEvent.Text e) {
+		if (!Seasons.enabled)
+			return;
 		if (SeasonsAPI.instance.getCfg().enableTempDebug && Minecraft.getMinecraft().gameSettings.showDebugInfo) {
 			e.getLeft().add("\u00a7c[SAPI]\u00a7rChunks in temperature map : " + tempMap.size());
 		}
@@ -98,6 +105,8 @@ public class WorldHandler {
 	
 	@SubscribeEvent
 	public void drawOverlay(TickEvent.RenderTickEvent e) {
+		if (!Seasons.enabled)
+			return;
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayer p = mc.thePlayer;
 		if (mc.thePlayer == null || mc.theWorld == null || !mc.inGameHasFocus || ((WorldInterface)SeasonsAPI.instance.getWorldInterface()).getWorld() == null)
@@ -145,6 +154,8 @@ public class WorldHandler {
 	
 	@SubscribeEvent
 	public void worldTick(TickEvent.WorldTickEvent e) {
+		if (!Seasons.enabled)
+			return;
 		if (e.world.getWorldInfo().isRaining()) {
 			e.world.setRainStrength(SeasonsAPI.instance.cfg.getRainFall(SeasonsAPI.instance.getWorldInterface().getSeason()));
 		}
@@ -162,6 +173,8 @@ public class WorldHandler {
 	
 	@SubscribeEvent
 	public void livingTick (LivingUpdateEvent e) {
+		if (!Seasons.enabled)
+			return;
 		BlockPos pos = new BlockPos(e.getEntityLiving().posX, e.getEntityLiving().posY, e.getEntityLiving().posZ);
 		SeasonsCFG cfg = SeasonsAPI.instance.getCfg();
 		World world = e.getEntityLiving().worldObj;
@@ -214,5 +227,13 @@ public class WorldHandler {
 	public void worldUnload(WorldEvent.Unload e) {
 		System.out.println("Unloading " + tempMap.size() + " chunks");
 		((WorldInterface)SeasonsAPI.instance.getWorldInterface()).removeWorld();
+	}
+	
+	@SubscribeEvent
+	public void clientConnect (ClientConnectedToServerEvent e) {
+		if (e.getConnectionType().equalsIgnoreCase("vanilla"))
+			Seasons.enabled = false;
+		else
+			Seasons.enabled = true;
 	}
 }

@@ -3,7 +3,6 @@ package mod.mindcraft.seasons;
 import mod.mindcraft.seasons.api.init.SeasonsAPI;
 import mod.mindcraft.seasons.api.interfaces.IBlockTemperatureRegistry;
 import mod.mindcraft.seasons.api.interfaces.IWorldInterface;
-import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;

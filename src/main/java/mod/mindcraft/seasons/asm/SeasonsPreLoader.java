@@ -3,12 +3,9 @@ package mod.mindcraft.seasons.asm;
 import java.util.Map;
 
 import net.minecraftforge.fml.common.DummyModContainer;
-import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 public class SeasonsPreLoader extends DummyModContainer implements IFMLLoadingPlugin {
-	
-	ModMetadata md = new ModMetadata();
 	
 	@Override
 	public String[] getASMTransformerClass() {
@@ -16,14 +13,11 @@ public class SeasonsPreLoader extends DummyModContainer implements IFMLLoadingPl
 	}
 
 	public SeasonsPreLoader() {
-		md.modId="seasonsAPIPreloader";
-		md.version="1.0.0";
-		md.name="Seasons API Preloader";
 	}
 	
 	@Override
 	public String getModContainerClass() {
-		return "mod.mindcraft.seasons.asm.SeasonsPreLoader";
+		return null;
 	}
 
 	@Override
@@ -39,25 +33,5 @@ public class SeasonsPreLoader extends DummyModContainer implements IFMLLoadingPl
 	@Override
 	public String getAccessTransformerClass() {
 		return null;
-	}
-	
-	@Override
-	public ModMetadata getMetadata() {
-		return md;
-	}
-	
-	@Override
-	public String getModId() {
-		return getMetadata().modId;
-	}
-	
-	@Override
-	public String getName() {
-		return getMetadata().name;
-	}
-	
-	@Override
-	public String getVersion() {
-		return getMetadata().name;
 	}
 }
