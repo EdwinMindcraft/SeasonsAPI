@@ -23,7 +23,7 @@ public class WorldInterface implements IWorldInterface {
 	}
 
 	public void removeWorld() {
-		setWorld(null);
+		//setWorld(null);
 		WorldHandler.tempMap.clear();
 	}
 	
