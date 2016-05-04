@@ -1,5 +1,7 @@
 package mod.mindcraft.seasons;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -11,11 +13,11 @@ import mod.mindcraft.seasons.api.init.SeasonsCFG.ScreenCoordinates;
 import mod.mindcraft.seasons.api.interfaces.ITemperatureUpdater;
 import mod.mindcraft.seasons.api.utils.DamageSources;
 import net.minecraft.block.BlockCrops;
+import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -26,6 +28,7 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -53,43 +56,54 @@ public class WorldHandler {
 		if (!Seasons.enabled)
 			return;
 		if (e.getWorld().getLightFromNeighbors(e.getPos().up()) >= 9) {
-			int i = ((Integer)e.state.getValue(BlockCrops.AGE)).intValue();
-			if (i < 7) {
-				Random rand = new Random();
-				float multiplier = 0;
-				switch (SeasonsAPI.instance.getWorldInterface().getSeason()) {
-				case SPRING:
-					multiplier = SeasonsAPI.instance.getCfg().springGrowthMultiplier;
-					break;
-				case SUMMER:
-					multiplier = SeasonsAPI.instance.getCfg().summerGrowthMultiplier;					
-					break;
-				case AUTUMN:
-					multiplier = SeasonsAPI.instance.getCfg().autumnGrowthMultiplier;					
-					break;
-				case WINTER:
-					multiplier = SeasonsAPI.instance.getCfg().winterGrowthMultiplier;					
-					break;					
-				default:
-					break;
-				}
-				
-				int bonusStage = 0;
-				if (multiplier > 0) {
-					for (;multiplier > 0; multiplier--) {
-						if (rand.nextFloat() <= multiplier)
-							bonusStage++;
+			Method getAge = ReflectionHelper.findMethod(BlockCrops.class, (BlockCrops)e.state.getBlock(), new String[] {"e", "getAge"});
+			try {
+			PropertyInteger age = (PropertyInteger) getAge.invoke((BlockCrops)e.state.getBlock());
+				int i = e.state.getValue(age).intValue();
+				if (age.getAllowedValues().contains(i + 1)) {
+					Random rand = new Random();
+					float multiplier = 0;
+					switch (SeasonsAPI.instance.getWorldInterface().getSeason()) {
+					case SPRING:
+						multiplier = SeasonsAPI.instance.getCfg().springGrowthMultiplier;
+						break;
+					case SUMMER:
+						multiplier = SeasonsAPI.instance.getCfg().summerGrowthMultiplier;					
+						break;
+					case AUTUMN:
+						multiplier = SeasonsAPI.instance.getCfg().autumnGrowthMultiplier;					
+						break;
+					case WINTER:
+						multiplier = SeasonsAPI.instance.getCfg().winterGrowthMultiplier;					
+						break;					
+					default:
+						break;
 					}
+					
+					int bonusStage = 0;
+					if (multiplier > 0) {
+						for (;multiplier > 0; multiplier--) {
+							if (rand.nextFloat() <= multiplier)
+								bonusStage++;
+						}
+					}
+					else {
+						for (;multiplier < 0; multiplier++) {
+							if (rand.nextFloat() <= Math.abs(multiplier) && rand.nextBoolean())
+								bonusStage--;
+						}
+					}
+					if (bonusStage == 0 || !age.getAllowedValues().contains(i + bonusStage))
+						return;
+					e.state = e.state.withProperty(age, i + bonusStage);
+					e.getWorld().setBlockState(e.getPos(), e.state);
 				}
-				else {
-					for (;multiplier < 0; multiplier++) {
-						if (rand.nextFloat() <= Math.abs(multiplier))
-							bonusStage--;
-					}					
-				}
-				i = MathHelper.clamp_int(i + bonusStage, 0, 7);
-				e.state = e.state.withProperty(BlockCrops.AGE, i);
-				e.getWorld().setBlockState(e.getPos(), e.state);
+			} catch (IllegalAccessException e1) {
+				e1.printStackTrace();
+			} catch (IllegalArgumentException e1) {
+				e1.printStackTrace();
+			} catch (InvocationTargetException e1) {
+				e1.printStackTrace();
 			}
 		}
 	}
