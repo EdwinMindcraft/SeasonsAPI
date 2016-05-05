@@ -1,12 +1,12 @@
-seasonsseasons=Seasons Settings
-seasonstemperature=Temperature Settings
-seasonsadvanced=Advanced Settings
-seasonsarmor=Armor Settings
+seasons=Seasons Settings
+temperature=Temperature Settings
+advanced=Advanced Settings
+armor=Armor Settings
 spring=Spring Settings
 winter=Winter Settings
 summer=Summer Settings
 autumn=Autumn Settings
-seasonsrendering=Rendering Settings
+rendering=Rendering Settings
 
 commands.seasons.spring=Set season to Spring of year %d
 commands.seasons.summer=Set season to Summer of year %d

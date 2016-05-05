@@ -25,7 +25,6 @@ public class WorldInterface implements IWorldInterface {
 	}
 
 	public void removeWorld() {
-		//setWorld(null);
 		WorldHandler.tempMap.clear();
 	}
 	
@@ -73,7 +72,7 @@ public class WorldInterface implements IWorldInterface {
 		if (external) {
 			try {
 				float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).calcBlockExternalTemp(worldObj, newPos);
-				temp += getSeason().temperatureDif;
+				temp += getTemperatureDif();
 				temp += (getWorld().getBiomeGenForCoords(pos).getTemperature() * 12.5F * timeMultiplier);
 				if (!getWorld().canBlockSeeSky(pos)) temp /= 1.5;
 				return temp > 0 ? temp * getSeason().temperatureMultiplier : temp * getSeason().getOpposite().temperatureMultiplier;
@@ -82,7 +81,7 @@ public class WorldInterface implements IWorldInterface {
 				temp.calcChunkTemp(getWorld(), getWorld().getChunkFromBlockCoords(newPos).xPosition * 16, getWorld().getChunkFromBlockCoords(newPos).zPosition * 16);
 				WorldHandler.tempMap.put(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair(), temp);
 				float temp2 = temp.getTempForBlock(newPos);
-				temp2 += getSeason().temperatureDif;
+				temp2 += getTemperatureDif();
 				temp2 += (getWorld().getBiomeGenForCoords(pos).getTemperature() * 12.5F * timeMultiplier);
 				if (!getWorld().canBlockSeeSky(pos)) temp2 /= 1.5;
 				return temp2 > 0 ? temp2 * getSeason().temperatureMultiplier : temp2 * getSeason().getOpposite().temperatureMultiplier;
@@ -90,11 +89,10 @@ public class WorldInterface implements IWorldInterface {
 		} else {
 			try {
 				float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).getTempForBlock(newPos);
-				float toAdd = getSeason().temperatureDif;
+				float toAdd = getTemperatureDif();
 				toAdd += ((getWorld().getBiomeGenForCoords(pos).getTemperature()) * 12.5F * timeMultiplier);
 				toAdd *= ((float)getWorld().getLightFor(EnumSkyBlock.SKY, newPos) / 15);
 				float newTemp = temp + toAdd;
-				//if (!getWorld().canBlockSeeSky(pos)) newTemp /= 1.5;
 				if (newTemp == 0)
 					newTemp = temp;
 				if (temp != timeTemp) {
@@ -108,7 +106,7 @@ public class WorldInterface implements IWorldInterface {
 				chunkTemp.calcChunkTemp(getWorld(), getWorld().getChunkFromBlockCoords(newPos).xPosition * 16, getWorld().getChunkFromBlockCoords(newPos).zPosition * 16);
 				WorldHandler.tempMap.put(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair(), chunkTemp);
 				float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).getTempForBlock(newPos);
-				float toAdd = getSeason().temperatureDif;
+				float toAdd = getTemperatureDif();
 				toAdd += (getWorld().getBiomeGenForCoords(pos).getTemperature() * 12.5F * timeMultiplier);
 				toAdd *= (1-((float)getWorld().getLightFor(EnumSkyBlock.SKY, newPos) / 15F) * timeMultiplier);
 				float newTemp = temp + toAdd;
@@ -123,7 +121,24 @@ public class WorldInterface implements IWorldInterface {
 			}
 		}
 	}
-
+	
+	private float getTemperatureDif() {
+		long seasonMiddle = 12000 * SeasonsAPI.instance.getCfg().seasonLenght;
+		EnumSeason season = getSeason();
+		EnumSeason other;
+		boolean prev = false;
+		if (worldObj.getWorldTime() % (seasonMiddle*2) >= seasonMiddle) {
+			other = season.next();
+		} else {
+			other = season.prev();
+			prev = true;
+		}
+		float current = Math.abs(((float)worldObj.getWorldTime() + (float)seasonMiddle) % ((float)seasonMiddle * 2)) / ((float)seasonMiddle * 2);
+		if (prev)
+			return ((float)season.temperatureDif * current) + ((float)other.temperatureDif * (1F-current));
+		return ((float)other.temperatureDif * current) + ((float)season.temperatureDif * (1F-current));
+	}
+	
 	@Override
 	public float getTemperature(BlockPos pos) {
 		return getTemperature(pos, false);

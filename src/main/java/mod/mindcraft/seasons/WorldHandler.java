@@ -65,16 +65,16 @@ public class WorldHandler {
 					float multiplier = 0;
 					switch (SeasonsAPI.instance.getWorldInterface().getSeason()) {
 					case SPRING:
-						multiplier = SeasonsAPI.instance.getCfg().springGrowthMultiplier;
+						multiplier = SeasonsAPI.instance.getCfg().spring.growthMultiplier;
 						break;
 					case SUMMER:
-						multiplier = SeasonsAPI.instance.getCfg().summerGrowthMultiplier;					
+						multiplier = SeasonsAPI.instance.getCfg().summer.growthMultiplier;					
 						break;
 					case AUTUMN:
-						multiplier = SeasonsAPI.instance.getCfg().autumnGrowthMultiplier;					
+						multiplier = SeasonsAPI.instance.getCfg().autumn.growthMultiplier;					
 						break;
 					case WINTER:
-						multiplier = SeasonsAPI.instance.getCfg().winterGrowthMultiplier;					
+						multiplier = SeasonsAPI.instance.getCfg().winter.growthMultiplier;					
 						break;					
 					default:
 						break;

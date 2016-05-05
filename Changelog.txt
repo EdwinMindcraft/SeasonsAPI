@@ -2,6 +2,10 @@
 -Big trees are now almost properly behaving in autumn
 -Connecting to a vanilla server will disable this while connected
 -Fixed a bug were beetroot would crash the game
+-Season Temperature scaling
+-Custom Leaves Colors per seasons (Config : seasons/<season>/Leaves Color)
+    Format shouldn't crash your game.
+-Uniform Leaves for all ! (Config : seasons/<seasons>/Use Uniform Leaves)
 
 1.1.2a
 -Fixed crash when changing dimension

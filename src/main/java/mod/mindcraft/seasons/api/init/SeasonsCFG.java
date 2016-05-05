@@ -1,9 +1,12 @@
 package mod.mindcraft.seasons.api.init;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import mod.mindcraft.seasons.api.enums.EnumSeason;
 import net.minecraftforge.common.config.Configuration;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class SeasonsCFG extends Configuration {
 	
@@ -15,15 +18,11 @@ public class SeasonsCFG extends Configuration {
 	public int burntStart;
 	public int burntDiff;
 	public boolean enableTempDebug;
-	public float summerGrowthMultiplier;
-	public float springGrowthMultiplier;
-	public float autumnGrowthMultiplier;
-	public float winterGrowthMultiplier;
-	public boolean useUniformLeavesInAutumn;
-	public float summerRainfall;
-	public float springRainfall;
-	public float autumnRainfall;
-	public float winterRainfall;
+	
+	public SeasonCategory spring;
+	public SeasonCategory summer;
+	public SeasonCategory autumn;
+	public SeasonCategory winter;	
 	
 	public boolean morningSeasonSet;
 	
@@ -65,16 +64,11 @@ public class SeasonsCFG extends Configuration {
 		burntStart = getInt("Burnt Start", "temperature", 80, -1000, 1000, "At which temperature does burnt starts - Hardcore Mode");
 		burntDiff = getInt("Burnt Level Difference", "temperature", 100, 1, 1000, "Temperature between burnt levels - Hardcore Mode");
 		enableTempDebug = getBoolean("Enable Debug", "advanced", true, "Enable the temperature display in the debug screen");
-		summerGrowthMultiplier = getFloat("Summer Growth Multiplier", "seasons.summer", 0F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
-		springGrowthMultiplier = getFloat("Spring Growth Multiplier", "seasons.spring", 0.75F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
-		autumnGrowthMultiplier = getFloat("Autumn Growth Multiplier", "seasons.autumn", -0.1F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
-		winterGrowthMultiplier = getFloat("Winter Growth Multiplier", "seasons.winter", -0.5F, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
-		summerRainfall = getFloat("Summer Rainfall", "seasons.summer", 0.25F, 0F, 10F, "Rainfall in summer");
-		springRainfall = getFloat("Spring Rainfall", "seasons.spring", 2F, 0F, 10F, "Rainfall in spring");
-		autumnRainfall = getFloat("Autumn Rainfall", "seasons.autumn", 3F, 0F, 10F, "Rainfall in autumn");
-		winterRainfall = getFloat("Winter Rainfall", "seasons.winter", 1F, 0F, 10F, "Rainfall in winter");
 		
-		useUniformLeavesInAutumn = getBoolean("Use Uniform Leaves", "seasons.autumn", false, "Enable this to use the uniform-red leaves in autumn");
+		spring = new SeasonCategory(this, "spring", 2.0F, 0.75F, false, new int[] {0x55ff00});
+		summer = new SeasonCategory(this, "summer", 1.0F, 0.00F, false, new int[] {0xffff00});
+		autumn = new SeasonCategory(this, "autumn", 3.0F, -0.1F, false, new int[] {0xff0000, 0xff8000, 0xffff00});
+		winter = new SeasonCategory(this, "winter", 1.0F, -0.5F, false, new int[] {0xff5500});
 		
 		morningSeasonSet = getBoolean("Morning Season", "advanced", true, "Does the seasons command place you in the morning ?");
 		armorMul = get("armors", "Armor Multiplier", new double[]{0.25F, 0.25F, 0.25F, 0.25F}, "Armor multiplier",  0, 1, true, 4).getDoubleList();
@@ -96,10 +90,10 @@ public class SeasonsCFG extends Configuration {
 	
 	public float getRainFall(EnumSeason season) {
 		switch (season) {
-		case SPRING: return springRainfall;
-		case SUMMER: return summerRainfall;
-		case AUTUMN: return autumnRainfall;
-		case WINTER: return winterRainfall;
+		case SPRING: return spring.rainfall;
+		case SUMMER: return summer.rainfall;
+		case AUTUMN: return autumn.rainfall;
+		case WINTER: return winter.rainfall;
 		default:
 			return 0;
 		}
@@ -114,6 +108,42 @@ public class SeasonsCFG extends Configuration {
 			this.y = y;
 			this.display = display;
 			this.invert = invert;
+		}
+	}
+	
+	public static class SeasonCategory {
+		
+		public float rainfall, growthMultiplier;
+		public boolean useUniformLeaves;
+		public int[] colors;
+		
+		public SeasonCategory(SeasonsCFG cfgFile, String name, float rainfall, float growthMultiplier, boolean useUniformLeaves, int[] leavesColors) {
+			this.rainfall = cfgFile.getFloat(StringUtils.capitalize(name.toLowerCase()) + " Rainfall", "seasons." + name.toLowerCase(), rainfall, 0F, 10F, "Rainfall in " + name.toLowerCase());
+			this.growthMultiplier = cfgFile.getFloat(StringUtils.capitalize(name.toLowerCase()) + " Growth Multiplier", "seasons." + name.toLowerCase(), growthMultiplier, -10F, 10F, "Bonus growth - 0 means vanilla - negative is decay");
+			this.useUniformLeaves = cfgFile.getBoolean("Use Uniform Leaves", "seasons." + name.toLowerCase(), useUniformLeaves, "Enable the uniform leaves");
+			ArrayList<String> colors = new ArrayList<String>();
+			for (int i : leavesColors) {
+				colors.add("#" + Integer.toHexString(i).toUpperCase());
+			}
+			int num = 0;
+			String[] colors2 = new String[colors.size()];
+			for (String i : colors) {
+				colors2[num] = i;
+				num++;
+			}
+			String[] newColors = cfgFile.get("seasons." + name, "Leaves Colors", colors2).getStringList();
+			ArrayList<Integer> colorInts = new ArrayList<Integer>();
+			for (String c : newColors) {
+				try{
+					colorInts.add(Integer.decode(c));
+				} catch (NumberFormatException e) {}
+			}
+			num = 0;
+			this.colors = new int[colorInts.size()];
+			for (Integer i : colorInts) {
+				this.colors[num] = i;
+				num++;
+			}
 		}
 	}
 }

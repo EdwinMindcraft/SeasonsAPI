@@ -35,19 +35,15 @@ public interface ISeasonColorizer {
 				EnumSeason season = SeasonsAPI.instance.getWorldInterface().getSeason();
 				EnumSeason other;
 				boolean prev = false;
-				if (time % (seasonMiddle*2) > seasonMiddle) {
+				if (time % (seasonMiddle*2) >= seasonMiddle) {
 					other = season.next();
 				} else {
 					other = season.prev();
 					prev = true;
 				}
 				float current = (((float)time + (float)seasonMiddle) % ((float)seasonMiddle * 2)) / ((float)seasonMiddle * 2);
-				//System.out.println(current);
 				int cColor = getColor(prev ? season : other, state, pos, world);
 				int oColor = getColor(prev ? other : season, state, pos, world);
-//				System.out.println("Percentage : " + current + ", Color : " + new Color(ColorizerUtils.mix(cColor, oColor, current)));
-//				System.out.println("Main Color : " + new Color(cColor).toString());
-//				System.out.println("Secondary Color : " + new Color(oColor).toString());
 				return ColorizerUtils.mix(cColor, oColor, current);
 			} catch (NullPointerException e) {return 0xffffff;}
 		}

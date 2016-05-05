@@ -10,7 +10,6 @@ import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockNewLog;
 import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockOldLog;
-import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.BlockPlanks.EnumType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -27,8 +26,13 @@ public class FoliageSeasonColorizer implements
 
 	@Override
 	public int getSpringColor(IBlockState state, BlockPos pos, World world) {
-		if (state.getBlock().equals(Blocks.leaves) && state.getValue(BlockOldLeaf.VARIANT).equals(BlockPlanks.EnumType.SPRUCE))
-			return 0;
+		if (!SeasonsAPI.instance.getCfg().spring.useUniformLeaves || SeasonsAPI.instance.getCfg().spring.colors.length == 0) {
+			if (SeasonsAPI.instance.getCfg().spring.colors.length == 1)
+				return SeasonsAPI.instance.getCfg().spring.colors[0];
+			if (world.getBlockState(pos).getBlock().equals(Blocks.leaves) || world.getBlockState(pos).getBlock().equals(Blocks.leaves))
+				return getLeavesColor(state, pos, world, SeasonsAPI.instance.getCfg().spring.colors);
+			return getVineColor(state, pos, world, SeasonsAPI.instance.getCfg().spring.colors);
+		}
 		return getSpringColor();
 	}
 
@@ -39,8 +43,13 @@ public class FoliageSeasonColorizer implements
 
 	@Override
 	public int getSummerColor(IBlockState state, BlockPos pos, World world) {
-		if (state.getBlock().equals(Blocks.leaves) && state.getValue(BlockOldLeaf.VARIANT).equals(BlockPlanks.EnumType.SPRUCE))
-			return 0;
+		if (!SeasonsAPI.instance.getCfg().summer.useUniformLeaves || SeasonsAPI.instance.getCfg().summer.colors.length == 0) {
+			if (SeasonsAPI.instance.getCfg().summer.colors.length == 1)
+				return SeasonsAPI.instance.getCfg().summer.colors[0];
+			if (world.getBlockState(pos).getBlock().equals(Blocks.leaves) || world.getBlockState(pos).getBlock().equals(Blocks.leaves))
+				return getLeavesColor(state, pos, world, SeasonsAPI.instance.getCfg().summer.colors);
+			return getVineColor(state, pos, world, SeasonsAPI.instance.getCfg().summer.colors);
+		}
 		return getSummerColor();
 	}
 
@@ -51,15 +60,34 @@ public class FoliageSeasonColorizer implements
 
 	@Override
 	public int getAutumnColor(IBlockState state, BlockPos pos, World world) {
-		if (!SeasonsAPI.instance.getCfg().useUniformLeavesInAutumn) {
+		if (!SeasonsAPI.instance.getCfg().autumn.useUniformLeaves || SeasonsAPI.instance.getCfg().autumn.colors.length == 0) {
+			if (SeasonsAPI.instance.getCfg().autumn.colors.length == 1)
+				return SeasonsAPI.instance.getCfg().autumn.colors[0];
 			if (world.getBlockState(pos).getBlock().equals(Blocks.leaves) || world.getBlockState(pos).getBlock().equals(Blocks.leaves))
-				return getLeavesColor(state, pos, world);
-			return getVineColor(state, pos, world);
+				return getLeavesColor(state, pos, world, SeasonsAPI.instance.getCfg().autumn.colors);
+			return getVineColor(state, pos, world, SeasonsAPI.instance.getCfg().autumn.colors);
 		}
 		return getAutumnColor();
 	}
+		
+	@Override
+	public int getWinterColor() {
+		return 0xff5500;
+	}
+
+	@Override
+	public int getWinterColor(IBlockState state, BlockPos pos, World world) {
+		if (!SeasonsAPI.instance.getCfg().winter.useUniformLeaves || SeasonsAPI.instance.getCfg().winter.colors.length == 0) {
+			if (SeasonsAPI.instance.getCfg().winter.colors.length == 1)
+				return SeasonsAPI.instance.getCfg().winter.colors[0];
+			if (world.getBlockState(pos).getBlock().equals(Blocks.leaves) || world.getBlockState(pos).getBlock().equals(Blocks.leaves))
+				return getLeavesColor(state, pos, world, SeasonsAPI.instance.getCfg().winter.colors);
+			return getVineColor(state, pos, world, SeasonsAPI.instance.getCfg().winter.colors);
+		}
+		return getWinterColor();
+	}
 	
-	private int getLeavesColor(IBlockState state, BlockPos pos, World world) {
+	private int getLeavesColor(IBlockState state, BlockPos pos, World world, int[] colors) {
 		EnumType type = (state.getBlock().equals(Blocks.leaves) ? state.getValue(BlockOldLeaf.VARIANT) : state.getValue(BlockNewLeaf.VARIANT));
 		boolean found = false;
 		//Jungle check
@@ -185,15 +213,10 @@ public class FoliageSeasonColorizer implements
 			pos = pos.up();
 		}
 		Random rand = new Random(pos.toString().hashCode());
-		switch (rand.nextInt(3)) {
-		case 0: return getAutumnColor();
-		case 1: return 0xff8000;
-		case 2: return 0xffff00;
-		}
-		return getAutumnColor();
+		return colors[rand.nextInt(colors.length)];
 	}
 	
-	private int getVineColor(IBlockState state, BlockPos pos, World world) {
+	private int getVineColor(IBlockState state, BlockPos pos, World world, int[] colors) {
 		boolean found = false;
 		for (int i = -1; i <= 1; i++) {
 			for (int j = 2; j >= -2; j--) {
@@ -257,24 +280,7 @@ public class FoliageSeasonColorizer implements
 			pos = pos.up();
 		}
 		Random rand = new Random(pos.toString().hashCode());
-		switch (rand.nextInt(3)) {
-		case 0: return getAutumnColor();
-		case 1: return 0xff8000;
-		case 2: return 0xffff00;
-		}
-		return getAutumnColor();
-	}
-	
-	@Override
-	public int getWinterColor() {
-		return 0xff5500;
-	}
-
-	@Override
-	public int getWinterColor(IBlockState state, BlockPos pos, World world) {
-		if (state.getBlock().equals(Blocks.leaves) && state.getValue(BlockOldLeaf.VARIANT).equals(BlockPlanks.EnumType.SPRUCE))
-			return 0;
-		return getWinterColor();
+		return colors[rand.nextInt(colors.length)];
 	}
 
 }
