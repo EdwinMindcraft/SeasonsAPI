@@ -56,7 +56,7 @@ public class WorldHandler {
 		if (!Seasons.enabled)
 			return;
 		if (e.getWorld().getLightFromNeighbors(e.getPos().up()) >= 9) {
-			Method getAge = ReflectionHelper.findMethod(BlockCrops.class, (BlockCrops)e.state.getBlock(), new String[] {"e", "getAge"});
+			Method getAge = ReflectionHelper.findMethod(BlockCrops.class, (BlockCrops)e.state.getBlock(), new String[] {"func_185524_e", "getAge"});
 			try {
 			PropertyInteger age = (PropertyInteger) getAge.invoke((BlockCrops)e.state.getBlock());
 				int i = e.state.getValue(age).intValue();
