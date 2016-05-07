@@ -20,12 +20,12 @@ plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 */
-version = "1.1.3"
+version = "1.1.3a"
 group= "mod.mindcraft.seasons" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "SeasonsAPI"
 
 minecraft {
-    version = "1.9-12.16.0.1868-1.9"
+    version = "1.9-12.16.1.1892"
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
@@ -81,6 +81,7 @@ processResources
         // replace version and mcversion
         expand 'version':project.version, 'mcversion':project.minecraft.version
     }
+	
 	// copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'

@@ -95,7 +95,7 @@ public class FoliageSeasonColorizer implements
 			for (int i = -7; i <= 7; i++) {
 				for (int j = -8; j <= 8; j++) {
 					for (int k = -7; k <= 7; k++) {
-						if (world.getBlockState(pos.add(i, j, k)).getBlock() instanceof BlockOldLog) {
+						if (world.getBlockState(pos.add(i, j, k)).getBlock() instanceof BlockOldLog && isBlockWood(pos.add(i, j, k), world)) {
 							int check = 0;
 							BlockPos finalCheckPos = pos.add(i, j, k);
 							EnumType logType = (world.getBlockState(pos.add(i, j, k)).getBlock().equals(Blocks.log) ? world.getBlockState(pos.add(i, j, k)).getValue(BlockOldLog.VARIANT) : world.getBlockState(pos.add(i, j, k)).getValue(BlockNewLog.VARIANT));
@@ -120,7 +120,7 @@ public class FoliageSeasonColorizer implements
 								finalCheckPos = finalCheckPos.add(0, 0, -1);									
 							}
 							if (check >= 2 &&
-									world.getBlockState(pos.add(i, j, k)).getBlock() instanceof BlockLog &&
+									isBlockWood(pos.add(i, j, k), world) &&
 									logType.equals(type) &&
 									world.getBlockState(pos.add(i, j, k)).getValue(BlockLog.LOG_AXIS).equals(EnumAxis.Y) &&
 									world.getBlockState(finalCheckPos).getBlock() instanceof BlockLog &&
@@ -139,7 +139,7 @@ public class FoliageSeasonColorizer implements
 			for (int i = -7; i <= 7; i++) {
 				for (int j = -8; j <= 8; j++) {
 					for (int k = -7; k <= 7; k++) {
-						if (world.getBlockState(pos.add(i, j, k)).getBlock() instanceof BlockNewLog) {
+						if (world.getBlockState(pos.add(i, j, k)).getBlock() instanceof BlockNewLog && isBlockWood(pos.add(i, j, k), world)) {
 							int check = 0;
 							BlockPos finalCheckPos = pos.add(i, j, k);
 							EnumType logType = (world.getBlockState(pos.add(i, j, k)).getValue(BlockNewLog.VARIANT));
@@ -164,7 +164,7 @@ public class FoliageSeasonColorizer implements
 								finalCheckPos = finalCheckPos.add(0, 0, -1);									
 							}
 							if (check >= 2 &&
-									world.getBlockState(pos.add(i, j, k)).getBlock() instanceof BlockLog &&
+									isBlockWood(pos.add(i, j, k), world) &&
 									logType.equals(type) &&
 									world.getBlockState(pos.add(i, j, k)).getValue(BlockLog.LOG_AXIS).equals(EnumAxis.Y) &&
 									world.getBlockState(finalCheckPos).getBlock() instanceof BlockLog &&
@@ -183,17 +183,13 @@ public class FoliageSeasonColorizer implements
 			for (int i = -1; i <= 1; i++) {
 				for (int j = 4; j >= -4; j--) {
 					for (int k = -1; k <= 1; k++) {
-						BlockPos newPos = pos.add(i, j, k);
-						if (world.getBlockState(newPos).getBlock() instanceof BlockLog &&
-								(world.getBlockState(newPos).getBlock().equals(Blocks.log)
-										? world.getBlockState(newPos).getValue(BlockOldLog.VARIANT)
-												: world.getBlockState(newPos).getValue(BlockNewLog.VARIANT))
-												.equals(type)
-												&& world.getBlockState(newPos).getValue(BlockLog.LOG_AXIS).equals(EnumAxis.Y)
-												) {
-							pos = newPos;
-							found = true;
-							break;
+						if (isBlockWood(pos.add(i, j, k), world)) {
+							BlockPos newPos = pos.add(i, j, k);
+							if (isBlockWood(pos.add(i, j, k), world) && world.getBlockState(pos.add(i, j, k)).getValue(BlockLog.LOG_AXIS).equals(EnumAxis.Y)) {
+								pos = newPos;
+								found = true;
+								break;
+							}							
 						}
 					}
 				}			
@@ -203,17 +199,13 @@ public class FoliageSeasonColorizer implements
 			for (int i = -2; i <= 2; i++) {
 				for (int j = 4; j >= -4; j--) {
 					for (int k = -2; k <= 2; k++) {
-						BlockPos newPos = pos.add(i, j, k);
-						if (world.getBlockState(newPos).getBlock() instanceof BlockLog &&
-								(world.getBlockState(newPos).getBlock().equals(Blocks.log)
-										? world.getBlockState(newPos).getValue(BlockOldLog.VARIANT)
-												: world.getBlockState(newPos).getValue(BlockNewLog.VARIANT))
-												.equals(type)
-												&& world.getBlockState(newPos).getValue(BlockLog.LOG_AXIS).equals(EnumAxis.Y)
-												) {
-							pos = newPos;
-							found = true;
-							break;
+						if (isBlockWood(pos.add(i, j, k), world)) {
+							BlockPos newPos = pos.add(i, j, k);
+							if (isBlockWood(pos.add(i, j, k), world) && world.getBlockState(pos.add(i, j, k)).getValue(BlockLog.LOG_AXIS).equals(EnumAxis.Y)) {
+								pos = newPos;
+								found = true;
+								break;
+							}							
 						}
 					}
 				}
@@ -223,11 +215,8 @@ public class FoliageSeasonColorizer implements
 			for (int i = -4; i <= 4; i++) {
 				for (int j = 4; j >= -4; j--) {
 					for (int k = -4; k <= 4; k++) {
-						if (world.getBlockState(pos.add(i, j, k)).getBlock() instanceof BlockLog) {
-							EnumType logType = (world.getBlockState(pos.add(i, j, k)).getBlock().equals(Blocks.log) ? world.getBlockState(pos.add(i, j, k)).getValue(BlockOldLog.VARIANT) : world.getBlockState(pos.add(i, j, k)).getValue(BlockNewLog.VARIANT));
-							if (world.getBlockState(pos.add(i, j, k)).getBlock() instanceof BlockLog &&
-									logType.equals(type) &&
-									world.getBlockState(pos.add(i, j, k)).getValue(BlockLog.LOG_AXIS).equals(EnumAxis.Y)) {
+						if (isBlockWood(pos.add(i, j, k), world)) {
+							if (isBlockWood(pos.add(i, j, k), world) && world.getBlockState(pos.add(i, j, k)).getValue(BlockLog.LOG_AXIS).equals(EnumAxis.Y)) {
 									pos = pos.add(i, j, k);
 									found = true;
 									break;
@@ -241,11 +230,8 @@ public class FoliageSeasonColorizer implements
 			for (int i = -7; i <= 7; i++) {
 				for (int j = 4; j >= -4; j--) {
 					for (int k = -7; k <= 7; k++) {
-						if (world.getBlockState(pos.add(i, j, k)).getBlock() instanceof BlockLog) {
-							EnumType logType = (world.getBlockState(pos.add(i, j, k)).getBlock().equals(Blocks.log) ? world.getBlockState(pos.add(i, j, k)).getValue(BlockOldLog.VARIANT) : world.getBlockState(pos.add(i, j, k)).getValue(BlockNewLog.VARIANT));
-							if (world.getBlockState(pos.add(i, j, k)).getBlock() instanceof BlockLog &&
-									logType.equals(type) &&
-									world.getBlockState(pos.add(i, j, k)).getValue(BlockLog.LOG_AXIS).equals(EnumAxis.Y)) {
+						if (isBlockWood(pos.add(i, j, k), world)) {
+							if (isBlockWood(pos.add(i, j, k), world) && world.getBlockState(pos.add(i, j, k)).getValue(BlockLog.LOG_AXIS).equals(EnumAxis.Y)) {
 									pos = pos.add(i, j, k);
 									found = true;
 									break;
@@ -294,7 +280,7 @@ public class FoliageSeasonColorizer implements
 			for (int i = -4; i <= 4; i++) {
 				for (int j = 4; j >= -4; j--) {
 					for (int k = -4; k <= 4; k++) {
-						if (world.getBlockState(pos.add(i, j, k)).getBlock() instanceof BlockLog) {
+						if (isBlockWood(pos.add(i, j, k), world)) {
 							BlockPos newPos = pos.add(i, j, k);
 							if (world.getBlockState(newPos).getBlock() instanceof BlockLog && world.getBlockState(newPos).getValue(BlockLog.LOG_AXIS).equals(EnumAxis.Y)) {
 									pos = newPos;
@@ -310,7 +296,7 @@ public class FoliageSeasonColorizer implements
 			for (int i = -7; i <= 7; i++) {
 				for (int j = 4; j >= -4; j--) {
 					for (int k = -7; k <= 7; k++) {
-						if (world.getBlockState(pos.add(i, j, k)).getBlock() instanceof BlockLog) {
+						if (isBlockWood(pos.add(i, j, k), world)) {
 							BlockPos newPos = pos.add(i, j, k);
 							if (world.getBlockState(newPos).getBlock() instanceof BlockLog && world.getBlockState(newPos).getValue(BlockLog.LOG_AXIS).equals(EnumAxis.Y)) {
 									pos = newPos;
@@ -327,6 +313,10 @@ public class FoliageSeasonColorizer implements
 		}
 		Random rand = new Random(pos.toString().hashCode());
 		return colors[rand.nextInt(colors.length)];
+	}
+	
+	private boolean isBlockWood(BlockPos pos, World world) {
+		return world.getBlockState(pos).getBlock().equals(Blocks.log) || world.getBlockState(pos).getBlock().equals(Blocks.log2);
 	}
 
 }
