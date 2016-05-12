@@ -29,6 +29,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -109,6 +111,7 @@ public class WorldHandler {
 	}
 	
 	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
 	public void debugInfo(RenderGameOverlayEvent.Text e) {
 		if (!Seasons.enabled)
 			return;
@@ -118,6 +121,7 @@ public class WorldHandler {
 	}
 	
 	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
 	public void drawOverlay(TickEvent.RenderTickEvent e) {
 		if (!Seasons.enabled)
 			return;
@@ -245,9 +249,10 @@ public class WorldHandler {
 	
 	@SubscribeEvent
 	public void clientConnect (ClientConnectedToServerEvent e) {
-		if (e.getConnectionType().equalsIgnoreCase("vanilla"))
+		if (e.getConnectionType().equalsIgnoreCase("vanilla")) {
 			Seasons.enabled = false;
-		else
+			return;
+		} else
 			Seasons.enabled = true;
 	}
 }

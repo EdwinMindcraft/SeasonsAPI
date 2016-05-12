@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
 @Mod(modid="seasonsapi", version="1.1.3a", acceptedMinecraftVersions="1.9", modLanguage="java", guiFactory="mod.mindcraft.seasons.ConfigFactory", canBeDeactivated=false)
 public class Seasons {
@@ -59,7 +60,8 @@ public class Seasons {
 	@EventHandler
 	public void postInit (FMLPostInitializationEvent e) {
 		tempReader.readTemperaturesFromFile();
-		LeavesGrassUtils.registerColors();
+		if (e.getSide() == Side.CLIENT)
+			LeavesGrassUtils.registerColors();
 	}
 	
 	@EventHandler
