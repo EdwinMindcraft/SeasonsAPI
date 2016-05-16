@@ -13,6 +13,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -64,11 +65,11 @@ public class CustomTemperatureReader {
 				newStr[1] = newStr[2];
 				newStr[2] = newStr[3];
 			}
-			if (!Block.blockRegistry.containsKey(new ResourceLocation(newStr[0]))) {
+			if (!GameRegistry.findRegistry(Block.class).containsKey(new ResourceLocation(newStr[0]))) {
 				logger.warn("Skiping line : " + str + ", Block : " + newStr[0] + " does not exist!");
 				continue;
 			}
-			Block block = Block.blockRegistry.getObject(new ResourceLocation(newStr[0]));
+			Block block = GameRegistry.findRegistry(Block.class).getValue(new ResourceLocation(newStr[0]));
 			IBlockState state = block.getDefaultState();
 			boolean ignoreState = false;
 			if (newStr[1].length() == 0) {

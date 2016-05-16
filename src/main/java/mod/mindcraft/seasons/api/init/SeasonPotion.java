@@ -37,38 +37,38 @@ public class SeasonPotion extends Potion {
 		GameRegistry.register(burnt, new ResourceLocation("seasonsapi", "burnt"));
 		GameRegistry.register(burnt_long, new ResourceLocation("seasonsapi", "long_burnt"));
 		GameRegistry.register(burnt_strong, new ResourceLocation("seasonsapi", "strong_burnt"));
-		BrewingRecipeRegistry.addRecipe(createBrewingRecipe(PotionTypes.awkward, new ItemStack(Items.snowball), hypothermia));
-		BrewingRecipeRegistry.addRecipe(createBrewingRecipe(PotionTypes.awkward, new ItemStack(Items.fire_charge), burnt));
+		BrewingRecipeRegistry.addRecipe(createBrewingRecipe(PotionTypes.AWKWARD, new ItemStack(Items.SNOWBALL), hypothermia));
+		BrewingRecipeRegistry.addRecipe(createBrewingRecipe(PotionTypes.AWKWARD, new ItemStack(Items.FIRE_CHARGE), burnt));
 		registerUpgrades(hypothermia, hypothermia_long, hypothermia_strong);
 		registerUpgrades(burnt, burnt_long, burnt_strong);
 	}
 	
 	private static BrewingRecipe createBrewingRecipe(PotionType in, ItemStack ingredient, PotionType out) {
-		return new BrewingRecipe(PotionUtils.addPotionToItemStack(new ItemStack(Items.potionitem), in), ingredient, (PotionUtils.addPotionToItemStack(new ItemStack(Items.potionitem), out)));
+		return new BrewingRecipe(PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), in), ingredient, (PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), out)));
 	}
 	
 	private static BrewingRecipe createSplashBrewingRecipe(PotionType in, ItemStack ingredient, PotionType out) {
-		return new BrewingRecipe(PotionUtils.addPotionToItemStack(new ItemStack(Items.splash_potion), in), ingredient, (PotionUtils.addPotionToItemStack(new ItemStack(Items.splash_potion), out)));
+		return new BrewingRecipe(PotionUtils.addPotionToItemStack(new ItemStack(Items.SPLASH_POTION), in), ingredient, (PotionUtils.addPotionToItemStack(new ItemStack(Items.SPLASH_POTION), out)));
 	}
 	
 	private static BrewingRecipe createLingeringBrewingRecipe(PotionType in, ItemStack ingredient, PotionType out) {
-		return new BrewingRecipe(PotionUtils.addPotionToItemStack(new ItemStack(Items.lingering_potion), in), ingredient, (PotionUtils.addPotionToItemStack(new ItemStack(Items.lingering_potion), out)));
+		return new BrewingRecipe(PotionUtils.addPotionToItemStack(new ItemStack(Items.LINGERING_POTION), in), ingredient, (PotionUtils.addPotionToItemStack(new ItemStack(Items.LINGERING_POTION), out)));
 	}
 	
 	private static void registerUpgrades(PotionType normal, PotionType extended, PotionType strong) {
-		BrewingRecipeRegistry.addRecipe(createBrewingRecipe(normal, new ItemStack(Items.redstone), extended));
-		BrewingRecipeRegistry.addRecipe(createBrewingRecipe(strong, new ItemStack(Items.redstone), extended));
-		BrewingRecipeRegistry.addRecipe(createBrewingRecipe(normal, new ItemStack(Items.glowstone_dust), strong));		
-		BrewingRecipeRegistry.addRecipe(createBrewingRecipe(extended, new ItemStack(Items.glowstone_dust), strong));	
-		BrewingRecipeRegistry.addRecipe(createSplashBrewingRecipe(normal, new ItemStack(Items.redstone), extended));
-		BrewingRecipeRegistry.addRecipe(createSplashBrewingRecipe(strong, new ItemStack(Items.redstone), extended));
-		BrewingRecipeRegistry.addRecipe(createSplashBrewingRecipe(normal, new ItemStack(Items.glowstone_dust), strong));		
-		BrewingRecipeRegistry.addRecipe(createSplashBrewingRecipe(extended, new ItemStack(Items.glowstone_dust), strong));	
-		BrewingRecipeRegistry.addRecipe(createLingeringBrewingRecipe(normal, new ItemStack(Items.redstone), extended));
-		BrewingRecipeRegistry.addRecipe(createLingeringBrewingRecipe(strong, new ItemStack(Items.redstone), extended));
-		BrewingRecipeRegistry.addRecipe(createLingeringBrewingRecipe(normal, new ItemStack(Items.glowstone_dust), strong));	
-		BrewingRecipeRegistry.addRecipe(createLingeringBrewingRecipe(extended, new ItemStack(Items.glowstone_dust), strong));	
-		BrewingRecipeRegistry.addRecipe(new BrewingRecipe(PotionUtils.addPotionToItemStack(new ItemStack(Items.potionitem), normal), new ItemStack(Items.gunpowder), (PotionUtils.addPotionToItemStack(new ItemStack(Items.splash_potion), normal))));
-		BrewingRecipeRegistry.addRecipe(new BrewingRecipe(PotionUtils.addPotionToItemStack(new ItemStack(Items.splash_potion), normal), new ItemStack(Items.dragon_breath), (PotionUtils.addPotionToItemStack(new ItemStack(Items.lingering_potion), normal))));
+		BrewingRecipeRegistry.addRecipe(createBrewingRecipe(normal, new ItemStack(Items.REDSTONE), extended));
+		BrewingRecipeRegistry.addRecipe(createBrewingRecipe(strong, new ItemStack(Items.REDSTONE), extended));
+		BrewingRecipeRegistry.addRecipe(createBrewingRecipe(normal, new ItemStack(Items.GLOWSTONE_DUST), strong));		
+		BrewingRecipeRegistry.addRecipe(createBrewingRecipe(extended, new ItemStack(Items.GLOWSTONE_DUST), strong));	
+		BrewingRecipeRegistry.addRecipe(createSplashBrewingRecipe(normal, new ItemStack(Items.REDSTONE), extended));
+		BrewingRecipeRegistry.addRecipe(createSplashBrewingRecipe(strong, new ItemStack(Items.REDSTONE), extended));
+		BrewingRecipeRegistry.addRecipe(createSplashBrewingRecipe(normal, new ItemStack(Items.GLOWSTONE_DUST), strong));		
+		BrewingRecipeRegistry.addRecipe(createSplashBrewingRecipe(extended, new ItemStack(Items.GLOWSTONE_DUST), strong));	
+		BrewingRecipeRegistry.addRecipe(createLingeringBrewingRecipe(normal, new ItemStack(Items.REDSTONE), extended));
+		BrewingRecipeRegistry.addRecipe(createLingeringBrewingRecipe(strong, new ItemStack(Items.REDSTONE), extended));
+		BrewingRecipeRegistry.addRecipe(createLingeringBrewingRecipe(normal, new ItemStack(Items.GLOWSTONE_DUST), strong));	
+		BrewingRecipeRegistry.addRecipe(createLingeringBrewingRecipe(extended, new ItemStack(Items.GLOWSTONE_DUST), strong));	
+		BrewingRecipeRegistry.addRecipe(new BrewingRecipe(PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), normal), new ItemStack(Items.GUNPOWDER), (PotionUtils.addPotionToItemStack(new ItemStack(Items.SPLASH_POTION), normal))));
+		BrewingRecipeRegistry.addRecipe(new BrewingRecipe(PotionUtils.addPotionToItemStack(new ItemStack(Items.SPLASH_POTION), normal), new ItemStack(Items.DRAGON_BREATH), (PotionUtils.addPotionToItemStack(new ItemStack(Items.LINGERING_POTION), normal))));
 	}
 }

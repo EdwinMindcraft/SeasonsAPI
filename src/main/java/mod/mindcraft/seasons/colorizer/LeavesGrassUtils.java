@@ -31,7 +31,7 @@ public class LeavesGrassUtils {
 			return originalColor;
 		}
 		try {
-			if (iblockstate.getBlock().equals(Blocks.leaves))
+			if (iblockstate.getBlock().equals(Blocks.LEAVES))
 			{
 				BlockPlanks.EnumType blockplanks$enumtype = (BlockPlanks.EnumType)iblockstate.getValue(BlockOldLeaf.VARIANT);
 				
@@ -67,12 +67,12 @@ public class LeavesGrassUtils {
 		Map<RegistryDelegate<Block>, IBlockColor> map = ReflectionHelper.getPrivateValue(BlockColors.class, colors, "blockColorMap");
 		ArrayList<Block> leavesBlock = new ArrayList<Block>();
 		ArrayList<Block> grassBlock = new ArrayList<Block>();
-		leavesBlock.add(Blocks.leaves);
-		leavesBlock.add(Blocks.leaves2);
-		leavesBlock.add(Blocks.vine);
-		grassBlock.add(Blocks.double_plant);
-		grassBlock.add(Blocks.grass);
-		grassBlock.add(Blocks.tallgrass);
+		leavesBlock.add(Blocks.LEAVES);
+		leavesBlock.add(Blocks.LEAVES2);
+		leavesBlock.add(Blocks.VINE);
+		grassBlock.add(Blocks.DOUBLE_PLANT);
+		grassBlock.add(Blocks.GRASS);
+		grassBlock.add(Blocks.TALLGRASS);
 		for(Block b : leavesBlock) {
 			IBlockColor color = map.get(b.delegate);
 			if(color != null)

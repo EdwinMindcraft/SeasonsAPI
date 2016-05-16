@@ -32,12 +32,12 @@ public class CommandTemperatureReload extends CommandBase {
 			SeasonsAPI.instance.getBlockTemperatureRegistry().clear();
 			Seasons.instance.addTemperatures();
 			Seasons.tempReader.readTemperaturesFromFile();
-			notifyOperators(sender, this, "Reloaded Temperature Values");
+			notifyCommandListener(sender, this, "Reloaded Temperature Values");
 			return;
 		}
 		if (args.length > 0 && args[0].equalsIgnoreCase("map")) {
 			WorldHandler.tempMap.clear();
-			notifyOperators(sender, this, "Reloaded Temperature Map, your game may lag a bit");
+			notifyCommandListener(sender, this, "Reloaded Temperature Map, your game may lag a bit");
 			return;
 		}
 		throw new WrongUsageException(getCommandUsage(sender));

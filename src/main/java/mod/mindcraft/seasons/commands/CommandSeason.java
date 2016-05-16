@@ -39,22 +39,23 @@ public class CommandSeason extends CommandBase {
 			System.out.println();
 			if (args[0].equalsIgnoreCase("spring")) {
 				sender.getEntityWorld().setWorldTime((long) (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 0.5 + yearTime - timeToRemove));
-				notifyOperators(sender, this, "commands.seasons.spring", parseInt(args[1], 0));
+				
+				notifyCommandListener(sender, this, "commands.seasons.spring", parseInt(args[1], 0));
 				return;
 			}
 			else if (args[0].equalsIgnoreCase("summer")) {
 				sender.getEntityWorld().setWorldTime((long) (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 1.5 + yearTime - timeToRemove));
-				notifyOperators(sender, this, "commands.seasons.summer", parseInt(args[1], 0));
+				notifyCommandListener(sender, this, "commands.seasons.summer", parseInt(args[1], 0));
 				return;
 			}
 			else if (args[0].equalsIgnoreCase("autumn")) {
 				sender.getEntityWorld().setWorldTime((long) (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 2.5 + yearTime - timeToRemove));
-				notifyOperators(sender, this, "commands.seasons.autumn", parseInt(args[1], 0));
+				notifyCommandListener(sender, this, "commands.seasons.autumn", parseInt(args[1], 0));
 				return;
 			}
 			else if (args[0].equalsIgnoreCase("winter")) {
 				sender.getEntityWorld().setWorldTime((long) (SeasonsAPI.instance.getCfg().seasonLenght * 24000 * 3.5 + yearTime - timeToRemove));
-				notifyOperators(sender, this, "commands.seasons.winter", parseInt(args[1], 0));
+				notifyCommandListener(sender, this, "commands.seasons.winter", parseInt(args[1], 0));
 				return;
 			}
 		}

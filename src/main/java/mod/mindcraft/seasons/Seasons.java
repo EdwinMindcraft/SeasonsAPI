@@ -44,17 +44,17 @@ public class Seasons {
 	
 	public void addTemperatures() {
 		IBlockTemperatureRegistry registry = SeasonsAPI.instance.getBlockTemperatureRegistry();
-		registry.addTemperatureToBlock(Blocks.torch.getDefaultState(), 50F, true, false);
-		registry.addTemperatureToBlock(Blocks.lit_pumpkin.getDefaultState(), 50F, true, false);
-		registry.addTemperatureToBlock(Blocks.lit_furnace.getDefaultState(), 50F, true, false);
-		registry.addTemperatureToBlock(Blocks.lava.getDefaultState(), 500F, true, false);
-		registry.addTemperatureToBlock(Blocks.flowing_lava.getDefaultState(), 500F, true, false);
-		registry.addTemperatureToBlock(Blocks.fire.getDefaultState(), 200F, true, false);
-		registry.addTemperatureToBlock(Blocks.ice.getDefaultState(), -10F, true, false);
-		registry.addTemperatureToBlock(Blocks.packed_ice.getDefaultState(), -20F, true, false);
-		registry.addTemperatureToBlock(Blocks.snow.getDefaultState(), -5F, true, false);
-		registry.addTemperatureToBlock(Blocks.water.getDefaultState(), 20F, true, false);
-		registry.addTemperatureToBlock(Blocks.flowing_water.getDefaultState(), 20F, true, false);
+		registry.addTemperatureToBlock(Blocks.TORCH.getDefaultState(), 50F, true, false);
+		registry.addTemperatureToBlock(Blocks.LIT_PUMPKIN.getDefaultState(), 50F, true, false);
+		registry.addTemperatureToBlock(Blocks.LIT_FURNACE.getDefaultState(), 50F, true, false);
+		registry.addTemperatureToBlock(Blocks.LAVA.getDefaultState(), 500F, true, false);
+		registry.addTemperatureToBlock(Blocks.FLOWING_LAVA.getDefaultState(), 500F, true, false);
+		registry.addTemperatureToBlock(Blocks.FIRE.getDefaultState(), 200F, true, false);
+		registry.addTemperatureToBlock(Blocks.ICE.getDefaultState(), -10F, true, false);
+		registry.addTemperatureToBlock(Blocks.PACKED_ICE.getDefaultState(), -20F, true, false);
+		registry.addTemperatureToBlock(Blocks.SNOW.getDefaultState(), -5F, true, false);
+		registry.addTemperatureToBlock(Blocks.WATER.getDefaultState(), 20F, true, false);
+		registry.addTemperatureToBlock(Blocks.FLOWING_WATER.getDefaultState(), 20F, true, false);
 	}
 	
 	@EventHandler
