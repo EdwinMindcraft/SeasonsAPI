@@ -9,6 +9,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -42,81 +43,21 @@ public class ChunkTemperature {
 		}
 	}
 	
-	public float getTempForBlock(BlockPos pos) {
-		int meta = (Math.abs(pos.getX()) % 16) + (Math.abs(pos.getZ()) % 16) * 16 + (Math.abs(pos.getY()) % 256) * 256;
-		return temp[meta];
+	public float getTempForBlock(World world, BlockPos pos) {
+		return temp[meta(pos)];
 	}
 	
-	public void addBlockTemp(BlockPos pos, float temp) {
-		int meta = (Math.abs(pos.getX()) % 16) + (Math.abs(pos.getZ()) % 16) * 16 + (Math.abs(pos.getY()) % 256) * 256;
-		this.temp[meta] = temp;
+	public void addBlockTemp(World world, BlockPos pos, float temp) {
+		this.temp[meta(pos)] = temp;
 	}
 	
 	public void calcBlockTemp(World world, BlockPos pos) {
-		//multiChunkRadiate(world, pos, SeasonsAPI.instance.cfg.temperatureSpreadDistance, 20, temp);
-		multiChunkRadiate(world, pos, SeasonsAPI.instance.cfg.temperatureSpreadDistance, 20, temp);
-//		int meta = (Math.abs(pos.getX()) % 16) + (Math.abs(pos.getZ()) % 16) * 16 + (Math.abs(pos.getY()) % 256) * 256;
-//		int tempSpreadDist = SeasonsAPI.instance.getCfg().temperatureSpreadDistance;
-//		float maxTemp = tempReg.getTemperatureForBlock(world.getBlockState(pos));
-//		boolean hasTemp = false;
-//		for (int y = -tempSpreadDist; y <= tempSpreadDist; y++) {
-//			if (y + pos.getY() < 0 || y + pos.getY() > 256)
-//				continue;
-//			for (int x = -tempSpreadDist; x <= tempSpreadDist; x++) {
-//				for (int z = -tempSpreadDist; z <= tempSpreadDist; z++) {
-//					int dist = Math.abs(x) + Math.abs(y) + Math.abs(z);
-//					if (dist == 0 || dist > tempSpreadDist)
-//						continue;
-//					BlockPos newPos = pos.add(x, y, z);
-//					if (world.isAirBlock(newPos))
-//						continue;
-//					float temp = tempReg.getTemperatureForBlock(world.getBlockState(newPos));
-//					if (temp == Integer.MIN_VALUE)
-//						continue;
-//					temp *= 1F - ((float)dist /(float)tempSpreadDist);
-//					if (maxTemp == Integer.MIN_VALUE || Math.abs(temp) > Math.abs(maxTemp))
-//						maxTemp = temp;
-//					hasTemp = true;
-//				}
-//			}
-//		}
-//		float timeTemp = wInt.getTemperatureForBiome(world.getBiomeGenForCoords(pos));
-//		timeTemp += timeTemp * (-Math.abs(64F - pos.getY()) / 64F);
-//		if (maxTemp == Integer.MIN_VALUE) {
-//			maxTemp = timeTemp;
-//		} else {
-//			maxTemp = (maxTemp * 0.5F) + (timeTemp * 0.5F);
-//		}
-//		temp[meta] = maxTemp;
-//		return hasTemp;
+		temp[meta(pos)] = tempReg.getTemperatureForBlock(world.getBlockState(pos));
+		multiChunkRadiate(world, pos, SeasonsAPI.instance.cfg.temperatureSpreadDistance, wInt.getTemperatureForBiome(world.getBiomeGenForCoords(pos)), temp);
 	}
 	
 	public float calcBlockExternalTemp(World world, BlockPos pos) {
-		int meta = (Math.abs(pos.getX()) % 16) + (Math.abs(pos.getZ()) % 16) * 16 + (Math.abs(pos.getY()) % 256) * 256;
-//		IChunkProvider provider = world.getChunkProvider();
 		float maxTemp = Integer.MIN_VALUE;
-//		for (int y = -1; y < 2; y++) {
-//			if (y + pos.getY() < 0 || y + pos.getY() > 256)
-//				continue;
-//			for (int x = -1; x < 2; x++) {
-//				for (int z = -1; z < 2; z++) {
-//					int dist = Math.abs(x) + Math.abs(y) + Math.abs(z);
-//					if (dist == 0 || dist > 1)
-//						continue;
-//					BlockPos newPos = pos.add(x, y, z);
-//					if (!provider.chunkExists((int)Math.floor((float)newPos.getX() / 16F), (int)Math.floor((float)newPos.getZ() / 16F)))
-//						continue;
-//					if (world.isAirBlock(newPos))
-//						continue;
-//					float temp = tempReg.getTemperatureForBlock(world.getBlockState(newPos));
-//					if (temp == Integer.MIN_VALUE)
-//						continue;
-//					temp *= (5-(float)dist) * 0.2F;
-//					if (temp > maxTemp)
-//						maxTemp = temp;
-//				}
-//			}
-//		}
 		float timeTemp = wInt.getTemperatureForBiome(world.getBiomeGenForCoords(pos));
 		timeTemp += timeTemp * (-Math.abs(64 - pos.getY()) / 64F);
 		if (maxTemp == Integer.MIN_VALUE) {
@@ -125,7 +66,7 @@ public class ChunkTemperature {
 		else if ((maxTemp <= 0 && timeTemp < maxTemp) || (maxTemp > 0 && timeTemp > maxTemp)) {
 			maxTemp = timeTemp;
 		}
-		temp[meta] = maxTemp;
+		temp[meta(pos)] = maxTemp;
 		return maxTemp;
 	}
 	
@@ -155,11 +96,12 @@ public class ChunkTemperature {
 						if (blockTemp < averageTemperature) {
 							if (blockTemp > internalMapping[meta]) {
 								internalMapping[meta] = blockTemp;
+								internalMapping = radiate(world, pos, radius, averageTemperature, internalMapping);
 							}
 						} else if (blockTemp > averageTemperature){
 							if (blockTemp < internalMapping[meta]) {
 								internalMapping[meta] = blockTemp;
-								internalMapping = radiate(pos, radius, averageTemperature, internalMapping);
+								internalMapping = radiate(world, pos, radius, averageTemperature, internalMapping);
 							}
 						} else {
 							internalMapping[meta] = averageTemperature;
@@ -184,10 +126,14 @@ public class ChunkTemperature {
 			}
 		}
 		temp = internalMapping;
+		
 	}
 	
-	private float[] radiate(BlockPos pos, int radius, float averageTemp, float[] internalMapping) {
-		pos = new BlockPos(pos.getX() % 16, pos.getY(), pos.getZ() % 16);
+	private float[] radiate(World world, BlockPos pos, int radius, float averageTemp, float[] internalMapping) {
+		ChunkCoordIntPair coords = world.getChunkFromBlockCoords(pos).getChunkCoordIntPair();
+		pos = pos.add(-coords.chunkXPos * 16, 0, -coords.chunkZPos * 16);
+		float blockTemp = internalMapping[meta(pos)];
+		System.out.println("BlockTemp " + blockTemp);
 		for (int y = -radius; y <= radius; y++) {
 			if (y + pos.getY() < 0 || y + pos.getY() > 255)
 				continue;
@@ -200,18 +146,9 @@ public class ChunkTemperature {
 					int dist = Math.abs(x) + Math.abs(y) + Math.abs(z);
 					if (dist == 0 || dist > radius)
 						continue;
-					int meta = (pos.getX() + x) + (pos.getZ() + z)*16 + (pos.getY() + y)*256;
-					float blockTemp = internalMapping[x + z*16 + y*256];
-					float newTemp = ((blockTemp * dist / (float)radius) + (averageTemp * (1 - (dist / (float)radius))));
-					if (newTemp < averageTemp) {
-						if (newTemp > internalMapping[meta]) {
-							internalMapping[meta] = newTemp;
-						}
-					} else if (newTemp > averageTemp){
-						if (newTemp < internalMapping[meta]) {
-							internalMapping[meta] = newTemp;
-						}
-					}
+					int meta = meta(pos.add(x, y, z));
+					float newTemp = getNewTemperature(blockTemp, dist, radius, averageTemp);
+					internalMapping[meta] = getTemperature(internalMapping[meta], averageTemp, newTemp);
 				}
 			}
 		}
@@ -220,7 +157,10 @@ public class ChunkTemperature {
 	
 	private void multiChunkRadiate(World world, BlockPos pos, int radius, float averageTemp, float[] internalMapping) {
 		HashMap<ChunkCoordIntPair, ChunkTemperature> map = WorldHandler.tempMap;
-		BlockPos chunkPos = new BlockPos(pos.getX() % 16, pos.getY(), pos.getZ() % 16);
+		ChunkCoordIntPair coords = world.getChunkFromBlockCoords(pos).getChunkCoordIntPair();
+		BlockPos chunkPos = pos.add(-coords.chunkXPos * 16, 0, -coords.chunkZPos * 16);
+		System.out.println(chunkPos);
+		float blockTemp = internalMapping[meta(pos)];
 		for (int y = -radius; y <= radius; y++) {
 			if (y + pos.getY() < 0 || y + pos.getY() > 255)
 				continue;
@@ -234,38 +174,20 @@ public class ChunkTemperature {
 						continue;
 					if (diffX || z + chunkPos.getZ() < 0 || z + chunkPos.getZ() > 15) {
 						BlockPos internalPos = pos.add(x, y, z);
-						ChunkTemperature temp = map.get(world.getChunkFromBlockCoords(internalPos));
-						int meta = internalPos.getX() % 16 + internalPos.getZ() % 16 *16 + internalPos.getY()*256;
-						float blockTemp = internalMapping[x + z*16 + y*256];
-						float newTemp = ((blockTemp * dist / (float)radius) + (averageTemp * (1 - (dist / (float)radius))));
-						int meta2 = meta(new BlockPos(internalPos.getX() % 16, internalPos.getY(), internalPos.getZ() % 16));
-						boolean changed = false;
-						if (newTemp < averageTemp) {
-							if (newTemp > temp.temp[meta]) {
-								temp.temp[meta2] = newTemp;
-								changed = true;
-							}
-						} else if (newTemp > averageTemp){
-							if (newTemp < temp.temp[meta]) {
-								temp.temp[meta2] = newTemp;
-								changed = true;
-							}
+						ChunkTemperature temp = map.get(world.getChunkFromBlockCoords(internalPos).getChunkCoordIntPair());
+						if (temp == null){
+							temp = new ChunkTemperature();
+							temp.calcChunkTemp(world, world.getChunkFromBlockCoords(pos));
+							map.put(world.getChunkFromBlockCoords(internalPos).getChunkCoordIntPair(), temp);
 						}
-						if (changed)
-							temp.temp = temp.radiate(new BlockPos(internalPos.getX() % 16, internalPos.getY(), internalPos.getZ()), radius - dist, averageTemp, temp.temp);
+						float newTemp = getNewTemperature(blockTemp, dist, radius, averageTemp);
+						int meta = meta(internalPos);
+						temp.temp[meta] = getTemperature(temp.temp[meta], averageTemp, newTemp);
 					} else {
-						int meta = meta(chunkPos.add(x, y, z));
-						float blockTemp = internalMapping[meta(chunkPos)];
-						float newTemp = ((blockTemp * dist / (float)radius) + (averageTemp * (1 - (dist / (float)radius))));
-						if (newTemp < averageTemp) {
-							if (newTemp > internalMapping[meta]) {
-								internalMapping[meta] = newTemp;
-							}
-						} else if (newTemp > averageTemp){
-							if (newTemp < internalMapping[meta]) {
-								internalMapping[meta] = newTemp;
-							}
-						}
+						int meta = meta(pos.add(x, y, z));
+						float newTemp = getNewTemperature(blockTemp, dist, radius, averageTemp);
+						internalMapping[meta] = getTemperature(internalMapping[meta], averageTemp, newTemp);
+						//System.out.println(pos.add(x, y, z) + " : " + newTemp + " vs " + internalMapping[meta]);
 					}
 				}
 			}
@@ -273,8 +195,31 @@ public class ChunkTemperature {
 		this.temp = internalMapping;
 	}
 	
+	private float getNewTemperature(float blockTemp, int dist, int radius, float averageTemp) {
+		return (blockTemp * (1F-((float)dist / (float)radius))) + (averageTemp * ((float)dist / (float)radius));
+	}
+	
+	private float getTemperature(float current, float averageTemp, float newTemp) {
+		if (newTemp < averageTemp) {
+			if (newTemp < current) {
+				return newTemp;
+			}
+		} else if (newTemp > averageTemp){
+			if (newTemp > current) {
+				return newTemp;
+			}
+		} else {
+			return averageTemp;
+		}
+		return current;
+//		return newTemp;
+	}
+	
 	private int meta(BlockPos pos) {
-		return (pos.getX()) + (pos.getZ())*16 + (pos.getY())*256;
+		int xMod = pos.getX() < 0 ? 16 : 0;
+		int zMod = pos.getZ() < 0 ? 16 : 0;
+		pos = new BlockPos(Math.abs(xMod - (pos.getX() % 16)), pos.getY(), Math.abs(zMod - (pos.getZ() % 16)));
+		return pos.getX() + (pos.getZ() * 16) + (MathHelper.clamp_int(pos.getY(), 0, 256) * 256);
 	}
 	
 	public void calcChunkTemp(World world, Chunk chunk) {

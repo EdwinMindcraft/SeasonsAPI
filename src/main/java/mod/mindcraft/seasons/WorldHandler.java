@@ -5,11 +5,14 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Random;
 
+import org.apache.commons.lang3.StringUtils;
+
 import mod.mindcraft.seasons.api.event.CropsUpdateEvent;
 import mod.mindcraft.seasons.api.init.SeasonPotion;
 import mod.mindcraft.seasons.api.init.SeasonsAPI;
 import mod.mindcraft.seasons.api.init.SeasonsCFG;
 import mod.mindcraft.seasons.api.init.SeasonsCFG.ScreenCoordinates;
+import mod.mindcraft.seasons.api.interfaces.ITemperatureUpdater;
 import mod.mindcraft.seasons.api.utils.DamageSources;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.properties.PropertyInteger;
@@ -31,8 +34,6 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class WorldHandler {
 	
 	public static HashMap<ChunkCoordIntPair, ChunkTemperature> tempMap = new HashMap<ChunkCoordIntPair, ChunkTemperature>();
@@ -42,14 +43,15 @@ public class WorldHandler {
 		if (!Seasons.enabled)
 			return;
 		try {
-//			if ((e.getState().getBlock() instanceof ITemperatureUpdater ? !SeasonsAPI.instance.getBlockTemperatureRegistry().hasTemperature(e.getState()) : !((ITemperatureUpdater)e.getState().getBlock()).requiresTemperatureUpdate(e.getWorld(), e.getState(), e.getPos())))
-//				return;
-//			if (!tempMap.containsKey(new ChunkCoordIntPair((int)Math.floor((float)e.getPos().getX() / 16F), (int)Math.floor((float)e.getPos().getZ() / 16F))))
-//				return;
-
+			if (e.getState() == null)
+				return;
+			if ((e.getState().getBlock() instanceof ITemperatureUpdater ? !((ITemperatureUpdater)e.getState().getBlock()).requiresTemperatureUpdate(e.getWorld(), e.getState(), e.getPos()): !SeasonsAPI.instance.getBlockTemperatureRegistry().hasTemperature(e.getState())))
+				return;
+			if (!tempMap.containsKey(e.getWorld().getChunkFromBlockCoords(e.getPos()).getChunkCoordIntPair()))
+				return;
 			tempMap.get(e.getWorld().getChunkFromBlockCoords(e.getPos()).getChunkCoordIntPair()).calcBlockTemp(e.getWorld(), e.getPos());
 		} catch (Exception ex) {
-			
+			ex.printStackTrace();
 		}
 	}
 	

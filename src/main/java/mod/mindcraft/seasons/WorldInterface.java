@@ -29,7 +29,7 @@ public class WorldInterface implements IWorldInterface {
 	}
 	
 	public void setTemp(BlockPos pos, float temp) {
-		WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(pos).getChunkCoordIntPair()).addBlockTemp(pos, temp);
+		WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(pos).getChunkCoordIntPair()).addBlockTemp(worldObj, pos, temp);
 	}
 	
 	@Override
@@ -80,7 +80,7 @@ public class WorldInterface implements IWorldInterface {
 				ChunkTemperature temp = new ChunkTemperature();
 				temp.calcChunkTemp(getWorld(), getWorld().getChunkFromBlockCoords(newPos));
 				WorldHandler.tempMap.put(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair(), temp);
-				float temp2 = temp.getTempForBlock(newPos);
+				float temp2 = temp.getTempForBlock(worldObj, newPos);
 				temp2 += getTemperatureDif();
 				temp2 += (getWorld().getBiomeGenForCoords(pos).getTemperature() * 12.5F * timeMultiplier);
 				if (!getWorld().canBlockSeeSky(pos)) temp2 /= 1.5;
@@ -88,7 +88,7 @@ public class WorldInterface implements IWorldInterface {
 			}			
 		} else {
 			try {
-				float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).getTempForBlock(newPos);
+				float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).getTempForBlock(worldObj, newPos);
 				float toAdd = getTemperatureDif();
 				toAdd += ((getWorld().getBiomeGenForCoords(pos).getTemperature()) * 12.5F * timeMultiplier);
 				toAdd *= ((float)getWorld().getLightFor(EnumSkyBlock.SKY, newPos) / 15);
@@ -105,7 +105,7 @@ public class WorldInterface implements IWorldInterface {
 				ChunkTemperature chunkTemp = new ChunkTemperature();
 				chunkTemp.calcChunkTemp(getWorld(), getWorld().getChunkFromBlockCoords(newPos));
 				WorldHandler.tempMap.put(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair(), chunkTemp);
-				float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).getTempForBlock(newPos);
+				float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).getTempForBlock(worldObj, newPos);
 				float toAdd = getTemperatureDif();
 				toAdd += (getWorld().getBiomeGenForCoords(pos).getTemperature() * 12.5F * timeMultiplier);
 				toAdd *= (1-((float)getWorld().getLightFor(EnumSkyBlock.SKY, newPos) / 15F) * timeMultiplier);
