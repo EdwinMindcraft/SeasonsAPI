@@ -10,7 +10,6 @@ import mod.mindcraft.seasons.api.init.SeasonPotion;
 import mod.mindcraft.seasons.api.init.SeasonsAPI;
 import mod.mindcraft.seasons.api.init.SeasonsCFG;
 import mod.mindcraft.seasons.api.init.SeasonsCFG.ScreenCoordinates;
-import mod.mindcraft.seasons.api.interfaces.ITemperatureUpdater;
 import mod.mindcraft.seasons.api.utils.DamageSources;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.properties.PropertyInteger;
@@ -42,15 +41,16 @@ public class WorldHandler {
 	public void onBlockUpdate(BlockEvent.NeighborNotifyEvent e) {
 		if (!Seasons.enabled)
 			return;
-		BlockPos pos = e.getPos();
 		try {
-			if ((e.getState().getBlock() instanceof ITemperatureUpdater ? !SeasonsAPI.instance.getBlockTemperatureRegistry().hasTemperature(e.getState()) : !((ITemperatureUpdater)e.getState().getBlock()).requiresTemperatureUpdate(e.getWorld(), e.getState(), e.getPos())))
-				return;
-			if (!tempMap.containsKey(new ChunkCoordIntPair((int)Math.floor((float)e.getPos().getX() / 16F), (int)Math.floor((float)e.getPos().getZ() / 16F))))
-				return;
+//			if ((e.getState().getBlock() instanceof ITemperatureUpdater ? !SeasonsAPI.instance.getBlockTemperatureRegistry().hasTemperature(e.getState()) : !((ITemperatureUpdater)e.getState().getBlock()).requiresTemperatureUpdate(e.getWorld(), e.getState(), e.getPos())))
+//				return;
+//			if (!tempMap.containsKey(new ChunkCoordIntPair((int)Math.floor((float)e.getPos().getX() / 16F), (int)Math.floor((float)e.getPos().getZ() / 16F))))
+//				return;
 
-			tempMap.get(e.getWorld().getChunkFromBlockCoords(pos).getChunkCoordIntPair()).calcBlockTemp(e.getWorld(), pos);
-		} catch (Exception ex) {}
+			tempMap.get(e.getWorld().getChunkFromBlockCoords(e.getPos()).getChunkCoordIntPair()).calcBlockTemp(e.getWorld(), e.getPos());
+		} catch (Exception ex) {
+			
+		}
 	}
 	
 	@SubscribeEvent
@@ -118,6 +118,7 @@ public class WorldHandler {
 		if (SeasonsAPI.instance.getCfg().enableTempDebug && Minecraft.getMinecraft().gameSettings.showDebugInfo) {
 			e.getLeft().add("\u00a7c[SAPI]\u00a7rChunks in temperature map : " + tempMap.size());
 		}
+		//System.out.println(Minecraft.getMinecraft().theWorld.getBiomeGenForCoords(Minecraft.getMinecraft().thePlayer.getPosition()).getFloatTemperature(Minecraft.getMinecraft().thePlayer.getPosition()));
 	}
 	
 	@SubscribeEvent
@@ -171,11 +172,14 @@ public class WorldHandler {
 	}
 	
 	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
 	public void worldTick(TickEvent.WorldTickEvent e) {
-		if (!Seasons.enabled)
-			return;
+//		if (!Seasons.enabled)
+//			return;
+		float rainfall = SeasonsAPI.instance.cfg.getRainFall(SeasonsAPI.instance.getWorldInterface().getSeason());
 		if (e.world.getWorldInfo().isRaining()) {
-			e.world.setRainStrength(SeasonsAPI.instance.cfg.getRainFall(SeasonsAPI.instance.getWorldInterface().getSeason()));
+			//System.out.println("MEH");
+			e.world.setRainStrength(rainfall);
 		}
 	}
 	

@@ -65,10 +65,10 @@ public class SeasonsCFG extends Configuration {
 		burntDiff = getInt("Burnt Level Difference", "temperature", 100, 1, 1000, "Temperature between burnt levels - Hardcore Mode");
 		enableTempDebug = getBoolean("Enable Debug", "advanced", true, "Enable the temperature display in the debug screen");
 		
-		spring = new SeasonCategory(this, "spring", 2.0F, 0.75F, false, new int[] {0x55ff00});
-		summer = new SeasonCategory(this, "summer", 1.0F, 0.00F, false, new int[] {0xffff00});
-		autumn = new SeasonCategory(this, "autumn", 3.0F, -0.1F, false, new int[] {0xff0000, 0xff8000, 0xffff00});
-		winter = new SeasonCategory(this, "winter", 1.0F, -0.5F, false, new int[] {0xff5500});
+		spring = new SeasonCategory(this, "spring", 0.5F, 0.75F, false, new int[] {0x55ff00});
+		summer = new SeasonCategory(this, "summer", 0.25F, 0.00F, false, new int[] {0xffff00});
+		autumn = new SeasonCategory(this, "autumn", 1.0F, -0.1F, false, new int[] {0xff0000, 0xff8000, 0xffff00});
+		winter = new SeasonCategory(this, "winter", 0.5F, -0.5F, false, new int[] {0xff5500});
 		
 		morningSeasonSet = getBoolean("Morning Season", "advanced", true, "Does the seasons command place you in the morning ?");
 		armorMul = get("armors", "Armor Multiplier", new double[]{0.25F, 0.25F, 0.25F, 0.25F}, "Armor multiplier",  0, 1, true, 4).getDoubleList();

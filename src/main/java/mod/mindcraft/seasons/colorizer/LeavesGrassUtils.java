@@ -33,6 +33,7 @@ public class LeavesGrassUtils {
 	
 	private static WorldInterface worldInterface = ((WorldInterface)SeasonsAPI.instance.getWorldInterface());
 	
+	@SuppressWarnings("unchecked")
 	public static int getLeavesColor(IBlockState iblockstate, IBlockAccess world, BlockPos pos, int originalColor) {
 		if (world == null || pos == null) {
 			return originalColor;

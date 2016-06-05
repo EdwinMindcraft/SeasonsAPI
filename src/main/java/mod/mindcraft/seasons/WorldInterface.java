@@ -78,7 +78,7 @@ public class WorldInterface implements IWorldInterface {
 				return temp > 0 ? temp * getSeason().temperatureMultiplier : temp * getSeason().getOpposite().temperatureMultiplier;
 			} catch (NullPointerException e) {
 				ChunkTemperature temp = new ChunkTemperature();
-				temp.calcChunkTemp(getWorld(), getWorld().getChunkFromBlockCoords(newPos).xPosition * 16, getWorld().getChunkFromBlockCoords(newPos).zPosition * 16);
+				temp.calcChunkTemp(getWorld(), getWorld().getChunkFromBlockCoords(newPos));
 				WorldHandler.tempMap.put(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair(), temp);
 				float temp2 = temp.getTempForBlock(newPos);
 				temp2 += getTemperatureDif();
@@ -103,7 +103,7 @@ public class WorldInterface implements IWorldInterface {
 				return newTemp > 0 ? newTemp * getSeason().temperatureMultiplier : newTemp * getSeason().getOpposite().temperatureMultiplier;
 			} catch (NullPointerException e) {
 				ChunkTemperature chunkTemp = new ChunkTemperature();
-				chunkTemp.calcChunkTemp(getWorld(), getWorld().getChunkFromBlockCoords(newPos).xPosition * 16, getWorld().getChunkFromBlockCoords(newPos).zPosition * 16);
+				chunkTemp.calcChunkTemp(getWorld(), getWorld().getChunkFromBlockCoords(newPos));
 				WorldHandler.tempMap.put(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair(), chunkTemp);
 				float temp = WorldHandler.tempMap.get(getWorld().getChunkFromBlockCoords(newPos).getChunkCoordIntPair()).getTempForBlock(newPos);
 				float toAdd = getTemperatureDif();
